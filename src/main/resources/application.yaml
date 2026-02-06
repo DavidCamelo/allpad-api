@@ -1,0 +1,35 @@
+springdoc:
+  api-docs:
+    path: /v3/v1/api-docs
+spring:
+  application:
+    name: All Pad
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://mariadb:3306/allpad?createDatabaseIfNotExist=true
+    username: root
+    password: admin
+  jpa:
+    hibernate:
+      ddl-auto: update
+#      ddl-auto: create-drop
+    properties:
+      hibernate:
+        batch_versioned_data: true
+        format_sql: true
+        generate_statistics: false
+        jdbc:
+          batch_size: 2
+        order_inserts: true
+        order_updates: true
+    show-sql: true
+logging:
+#  level:
+#    org.springframework.security: TRACE
+  pattern:
+    console: "%yellow(%d{yyyy-MM-dd HH:mm:ss.SSSZZZZZ}) %highlight(%-5level) ${PID:-} --- %red([${spring.application.name}]) %magenta([%thread]) %cyan([%X{traceId:-}-%X{spanId:-}]) %logger : %msg %n"
+jwt:
+  secret: REPLACE_FOR_THE_REAL_JWT_SECRET
+  reset-password-expiration: 900000 # -> 15 minutes
+  access-token-expiration: 3600000 # -> 1 hour
+  refresh-token-expiration: 86400000 # -> 1 days
