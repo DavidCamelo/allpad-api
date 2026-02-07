@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -25,17 +26,17 @@ public class HistoryServiceImpl implements HistoryService {
     }
 
     @Override
-    public HistoryDTO getById(Long id) {
+    public HistoryDTO getById(UUID id) {
         return historyMapper.map(findById(id));
     }
 
-    private History findById(Long id) {
+    private History findById(UUID id) {
         return historyRepository.findById(id)
                 .orElseThrow(() -> new HistoryNotFoundException(String.format("History with id %s not found", id)));
     }
 
     @Override
-    public List<HistoryDTO> getHistoriesByFileId(Long id) {
+    public List<HistoryDTO> getHistoriesByFileId(UUID id) {
         return historyMapper.map(historyRepository.findAllByFile(fileService.findById(id)));
     }
 
@@ -45,12 +46,12 @@ public class HistoryServiceImpl implements HistoryService {
     }
 
     @Override
-    public HistoryDTO update(Long id, HistoryDTO historyDTO) {
+    public HistoryDTO update(UUID id, HistoryDTO historyDTO) {
         return upsert(historyDTO, findById(id));
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(UUID id) {
         historyRepository.delete(findById(id));
     }
 

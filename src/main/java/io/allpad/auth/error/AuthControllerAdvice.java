@@ -1,5 +1,6 @@
 package io.allpad.auth.error;
 
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import io.allpad.auth.api.AuthController;
 import io.allpad.auth.api.RoleController;
 import io.allpad.auth.api.UserController;
@@ -41,6 +42,16 @@ public class AuthControllerAdvice {
     @ExceptionHandler(value = { RoleNotFoundException.class })
     public ResponseEntity<ErrorDTO> handleRoleNotFoundException(RoleNotFoundException ex) {
         return buildError(ex, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(value = { TokenExpiredException.class })
+    public ResponseEntity<ErrorDTO> handleTokenExpiredException(TokenExpiredException ex) {
+        return buildError(ex, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(value = { UserExistsException.class })
+    public ResponseEntity<ErrorDTO> handleUserExistsException(UserExistsException ex) {
+        return buildError(ex, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(value = { RoleExistsException.class })

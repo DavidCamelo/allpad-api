@@ -4,19 +4,20 @@ import io.allpad.pad.dto.FileDTO;
 import io.allpad.pad.entity.File;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface FileService {
     FileDTO create(FileDTO fileDTO);
 
-    FileDTO getById(Long id);
+    FileDTO getById(UUID id);
 
-    File findById(Long id);
+    File findById(UUID id);
 
-    List<FileDTO> getFilesByPadId(Long id);
+    List<FileDTO> getFilesByPadId(UUID id);
 
     List<FileDTO> getAll();
 
-    FileDTO update(Long id, FileDTO fileDTO);
+    FileDTO update(UUID id, FileDTO fileDTO);
 
-    void delete(Long id);
+    void delete(UUID id);
 }

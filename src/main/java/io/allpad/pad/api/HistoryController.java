@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.UUID;
 
 @Tag(name = "History API")
 @RestController
@@ -36,7 +37,7 @@ public class HistoryController {
 
     @Operation(summary = "Get by id", description = "Get history by id")
     @GetMapping("/{id}")
-    public ResponseEntity<HistoryDTO> getById(@PathVariable Long id) {
+    public ResponseEntity<HistoryDTO> getById(@PathVariable UUID id) {
         return ResponseEntity.ok(historyService.getById(id));
     }
 
@@ -49,13 +50,13 @@ public class HistoryController {
 
     @Operation(summary = "Update", description = "Update history")
     @PutMapping("/{id}")
-    public ResponseEntity<HistoryDTO> update(@PathVariable Long id, @RequestBody HistoryDTO historyDTO) {
+    public ResponseEntity<HistoryDTO> update(@PathVariable UUID id, @RequestBody HistoryDTO historyDTO) {
         return ResponseEntity.ok(historyService.update(id, historyDTO));
     }
 
     @Operation(summary = "Delete", description = "Delete a history by id")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable UUID id) {
         historyService.delete(id);
         return ResponseEntity.noContent().build();
     }

@@ -60,9 +60,10 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService(UserService userService) {
         return username -> {
+            var user = userService.getUserByUsername(username);
             var userDTO = userService.getByUsername(username);
             var authorities = userDTO.roles().stream().map(SimpleGrantedAuthority::new).collect(Collectors.toSet());
-            return new CustomUserDetails(userDTO.username(), userDTO.password(), authorities, userDTO);
+            return new CustomUserDetails(userDTO.username(), userDTO.password(), authorities, user, userDTO);
         };
     }
 

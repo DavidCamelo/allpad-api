@@ -53,10 +53,10 @@ public class AuthController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Reset password", description = "User reset password")
-    @PostMapping("/reset-password")
-    public ResponseEntity<Void> resetPassword(@RequestBody TokenDTO tokenDTO) {
-        authService.resetPassword(tokenDTO);
+    @Operation(summary = "Update password", description = "User update password")
+    @PostMapping("/update-password")
+    public ResponseEntity<Void> updatePassword(@RequestBody TokenDTO tokenDTO) {
+        authService.updatePassword(tokenDTO);
         return ResponseEntity.noContent().build();
     }
 }

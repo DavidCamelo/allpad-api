@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.UUID;
 
 @Tag(name = "File API")
 @RestController
@@ -39,7 +40,7 @@ public class FileController {
 
     @Operation(summary = "Get by id", description = "Get file by id")
     @GetMapping("/{id}")
-    public ResponseEntity<FileDTO> getById(@PathVariable Long id) {
+    public ResponseEntity<FileDTO> getById(@PathVariable UUID id) {
         return ResponseEntity.ok(fileService.getById(id));
     }
 
@@ -52,19 +53,19 @@ public class FileController {
 
     @Operation(summary = "Get files", description = "Get files by pad id")
     @GetMapping("/{id}/histories")
-    public ResponseEntity<List<HistoryDTO>> getHistoriesByFileId(@PathVariable Long id) {
+    public ResponseEntity<List<HistoryDTO>> getHistoriesByFileId(@PathVariable UUID id) {
         return ResponseEntity.ok(historyService.getHistoriesByFileId(id));
     }
 
     @Operation(summary = "Update", description = "Update file")
     @PutMapping("/{id}")
-    public ResponseEntity<FileDTO> update(@PathVariable Long id, @RequestBody FileDTO fileDTO) {
+    public ResponseEntity<FileDTO> update(@PathVariable UUID id, @RequestBody FileDTO fileDTO) {
         return ResponseEntity.ok(fileService.update(id, fileDTO));
     }
 
     @Operation(summary = "Delete", description = "Delete a file by id")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable UUID id) {
         fileService.delete(id);
         return ResponseEntity.noContent().build();
     }

@@ -3,13 +3,13 @@ package io.allpad.auth.service.impl;
 import io.allpad.auth.dto.UserDTO;
 import io.allpad.auth.entity.User;
 import io.allpad.auth.error.AuthException;
+import io.allpad.auth.error.UserExistsException;
 import io.allpad.auth.error.UserNotFoundException;
 import io.allpad.auth.mapper.UserMapper;
 import io.allpad.auth.repository.UserRepository;
 import io.allpad.auth.service.RoleService;
 import io.allpad.auth.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +28,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO create(UserDTO userDTO) {
         if (userRepository.findByEmail(userDTO.email()).isPresent()) {
-            throw new AuthException(String.format("User with email %s already exists", userDTO.email()));
+            throw new UserExistsException(String.format("User with email %s already exists", userDTO.email()));
         }
         var userRole = roleService.findByName("ROLE_USER");
         var user = User.builder()
@@ -57,7 +57,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserByUsername(String username) {
-        return findUserByUsername(username).orElseThrow(
+            return findUserByUsername(username).orElseThrow(
                 () -> new UserNotFoundException(String.format("User with username %s not found", username)));
     }
 

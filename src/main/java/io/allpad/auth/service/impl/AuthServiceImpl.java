@@ -11,10 +11,12 @@ import io.allpad.auth.service.JwtService;
 import io.allpad.auth.service.RefreshTokenService;
 import io.allpad.auth.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -66,13 +68,14 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void recoverPassword(UserDTO userDTO) {
-        var user = userService.getUserByUsername(userDTO.username());
-        var token = jwtService.generateResetPasswordToken(user.getUsername());
+        var user = userService.getUserByUsername(userDTO.email());
+        var token = jwtService.generateResetPasswordToken(user.getEmail());
+        log.info("http://localhost:5173/update-password/{}", token);
         // TODO send email with token
     }
 
     @Override
-    public void resetPassword(TokenDTO tokenDTO) {
+    public void updatePassword(TokenDTO tokenDTO) {
         var username = jwtService.validateTokenAndGetUsername(tokenDTO.token());
         userService.updatePassword(username, tokenDTO.password());
     }

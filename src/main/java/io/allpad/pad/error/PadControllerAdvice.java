@@ -16,6 +16,16 @@ import java.time.Instant;
 @RestControllerAdvice(assignableTypes = { PadController.class, FileController.class, HistoryController.class })
 public class PadControllerAdvice {
 
+    @ExceptionHandler(value = { UserNotFoundException.class })
+    public ResponseEntity<ErrorDTO> handleUserNotFoundException(UserNotFoundException ex) {
+        return buildError(ex, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(value = { AuthException.class })
+    public ResponseEntity<ErrorDTO> handleAuthException(AuthException ex) {
+        return buildError(ex, HttpStatus.FORBIDDEN);
+    }
+
     @ExceptionHandler(value = { PadNotFoundException.class })
     public ResponseEntity<ErrorDTO> handlePadNotFoundException(PadNotFoundException ex) {
         return buildError(ex, HttpStatus.NOT_FOUND);

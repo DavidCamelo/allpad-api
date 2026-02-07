@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -25,18 +26,18 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public FileDTO getById(Long id) {
+    public FileDTO getById(UUID id) {
         return fileMapper.map(findById(id));
     }
 
     @Override
-    public File findById(Long id) {
+    public File findById(UUID id) {
         return fileRepository.findById(id)
                 .orElseThrow(() -> new FileNotFoundException(String.format("File with id %s not found", id)));
     }
 
     @Override
-    public List<FileDTO> getFilesByPadId(Long id) {
+    public List<FileDTO> getFilesByPadId(UUID id) {
         return fileMapper.map(fileRepository.findAllByPad(padService.findById(id)));
     }
 
@@ -46,12 +47,12 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public FileDTO update(Long id, FileDTO fileDTO) {
+    public FileDTO update(UUID id, FileDTO fileDTO) {
         return upsert(fileDTO, findById(id));
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(UUID id) {
         fileRepository.delete(findById(id));
     }
 

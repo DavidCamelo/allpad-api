@@ -4,17 +4,18 @@ import io.allpad.pad.dto.PadDTO;
 import io.allpad.pad.entity.Pad;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface PadService {
     PadDTO create(PadDTO padDTO);
 
-    PadDTO getById(Long id);
+    PadDTO getById(UUID id);
 
-    Pad findById(Long id);
+    Pad findById(UUID id);
 
     List<PadDTO> getAll();
 
-    PadDTO update(Long id, PadDTO padDTO);
+    PadDTO update(UUID id, PadDTO padDTO);
 
-    void delete(Long id);
+    void delete(UUID id);
 }

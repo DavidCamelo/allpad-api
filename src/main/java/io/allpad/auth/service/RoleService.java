@@ -4,6 +4,7 @@ import io.allpad.auth.dto.RoleDTO;
 import io.allpad.auth.entity.Role;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface RoleService {
     RoleDTO create(RoleDTO roleDTO);
@@ -12,5 +13,5 @@ public interface RoleService {
 
     List<RoleDTO> getAll();
 
-    void delete(Long id);
+    void delete(UUID id);
 }

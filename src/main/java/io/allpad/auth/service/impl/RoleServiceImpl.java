@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -38,7 +39,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(UUID id) {
         roleRepository.delete(findById(id));
     }
 
@@ -47,7 +48,7 @@ public class RoleServiceImpl implements RoleService {
         return roleMapper.map(roleRepository.save(role));
     }
 
-    private Role findById(Long id) {
+    private Role findById(UUID id) {
         return roleRepository.findById(id)
                 .orElseThrow(() -> new RoleNotFoundException(String.format("Role with id %s not found", id)));
     }

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.UUID;
 
 @Tag(name = "Role API")
 @RestController
@@ -38,7 +39,7 @@ public class RoleController {
 
     @Operation(summary = "Delete", description = "Delete a role by id")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteRole(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteRole(@PathVariable UUID id) {
         roleService.delete(id);
         return ResponseEntity.noContent().build();
     }

@@ -15,5 +15,5 @@ public interface AuthService {
 
     void recoverPassword(UserDTO userDTO);
 
-    void resetPassword(TokenDTO tokenDTO);
+    void updatePassword(TokenDTO tokenDTO);
 }
