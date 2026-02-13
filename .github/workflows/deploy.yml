@@ -46,7 +46,7 @@ jobs:
         with:
           context: .
           push: true
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
           tags: ${{steps.prepare.outputs.docker_image}}:${{github.ref_name}},${{steps.prepare.outputs.docker_image}}:${{github.ref_name}}-${{steps.prepare.outputs.sha_short}}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -61,7 +61,7 @@ jobs:
         uses: Azure/k8s-deploy@v5
         with:
           action: deploy
-          namespace: spring-boot
+          namespace: allpad
           manifests: |
             kubernetes/deployment.yml
             kubernetes/service.yml
