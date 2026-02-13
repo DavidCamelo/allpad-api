@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: allpad-api
+  labels:
+    app: allpad-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: allpad-api
+  template:
+    metadata:
+      labels:
+        app: allpad-api
+    spec:
+      containers:
+        - name: allpad-api
+          image: davidcamelo/allpad-api:main
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          resources:
+            limits:
+              memory: 512Mi
+            requests:
+              memory: 64Mi
+          env:
+            - name: JAVA_OPTS
+              value: -Xms64m -Xmx512m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:InitiatingHeapOccupancyPercent=30 -XX:G1PeriodicGCInterval=5000
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+                  key: secret
+          imagePullPolicy: Always
+      restartPolicy: Always
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  revisionHistoryLimit: 1

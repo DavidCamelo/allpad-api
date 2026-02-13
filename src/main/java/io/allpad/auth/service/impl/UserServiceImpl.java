@@ -2,7 +2,6 @@ package io.allpad.auth.service.impl;
 
 import io.allpad.auth.dto.UserDTO;
 import io.allpad.auth.entity.User;
-import io.allpad.auth.error.AuthException;
 import io.allpad.auth.error.UserExistsException;
 import io.allpad.auth.error.UserNotFoundException;
 import io.allpad.auth.mapper.UserMapper;
@@ -57,7 +56,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserByUsername(String username) {
-            return findUserByUsername(username).orElseThrow(
+        return findUserByUsername(username).orElseThrow(
                 () -> new UserNotFoundException(String.format("User with username %s not found", username)));
     }
 

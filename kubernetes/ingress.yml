@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: allpad-api
+  labels:
+    app: allpad-api
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+spec:
+  rules:
+    - host: api.allpad.io
+      http:
+        paths:
+          - pathType: ImplementationSpecific
+            backend:
+              service:
+                name: allpad-api
+                port:
+                  number: 8080
+  tls:
+    - hosts:
+        - api.allpad.io
+      secretName: allpad-api-ingress
