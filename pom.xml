@@ -131,7 +131,6 @@
 						<buildArg>--verbose</buildArg>
 						<buildArg>-J-Xmx8g</buildArg>
 						<buildArg>-J-Xms128m</buildArg>
-						<buildArg>-J-XX:+UseSerialGC</buildArg>
 						<buildArg>--parallelism=1</buildArg>
 					</buildArgs>
 				</configuration>
