@@ -11,7 +11,7 @@ RUN sed -i 's/\r$//' mvnw && chmod +x mvnw
 
 # Build the native image
 # The binary will be created in /app/target/allpad-api
-RUN ./mvnw -Pnative native:compile -B --no-transfer-progress
+RUN ./mvnw -Pnative native:compile -X -B -DskipTests --no-transfer-progress
 
 # Stage 2: Create the runtime image
 FROM debian:bookworm-slim
