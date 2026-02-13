@@ -129,7 +129,9 @@
 				<configuration>
 					<buildArgs>
 						<buildArg>--verbose</buildArg>
-						<buildArg>-J-Xmx4g</buildArg>
+						<buildArg>-J-Xmx3g</buildArg>
+						<buildArg>-J-Xms128m</buildArg>
+						<buildArg>--parallelism=1</buildArg>
 					</buildArgs>
 				</configuration>
 			</plugin>
