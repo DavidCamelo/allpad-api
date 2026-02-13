@@ -6,12 +6,12 @@ WORKDIR /app
 # Copy the project files
 COPY . .
 
-# Fix windows line endings in mvnw script if built from windows source
-RUN sed -i 's/\r$//' mvnw && chmod +x mvnw
+# Install Maven to avoid using mvnw wrapper which fails in QEMU/ARM64
+RUN microdnf install -y maven findutils
 
 # Build the native image
 # The binary will be created in /app/target/allpad-api
-RUN ./mvnw -Pnative native:compile -X -B -DskipTests --no-transfer-progress
+RUN mvn -Pnative native:compile -B --no-transfer-progress
 
 # Stage 2: Create the runtime image
 FROM debian:bookworm-slim
