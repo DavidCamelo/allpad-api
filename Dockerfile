@@ -11,7 +11,7 @@ RUN microdnf install -y maven findutils
 
 # Build the native image
 # The binary will be created in /app/target/allpad-api
-RUN mvn -Pnative native:compile -B -DskipTests --no-transfer-progress
+RUN mvn -Pnative native:compile -e -B -DskipTests --no-transfer-progress
 
 # Stage 2: Create the runtime image
 FROM debian:bookworm-slim
