@@ -1,28 +1,24 @@
-# Stage 1: Build the native image
-FROM ghcr.io/graalvm/native-image-community:25 AS builder
+# Native Image
+#FROM ghcr.io/graalvm/native-image-community:25 AS builder
+#WORKDIR /app
+#COPY . .
+#RUN microdnf install -y maven findutils
+#RUN mvn -Pnative native:compile -e -B -DskipTests --no-transfer-progress
+#FROM debian:bookworm-slim
+#WORKDIR /app
+#COPY --from=builder /app/target/allpad-api .
+#EXPOSE 8080
+#ENTRYPOINT ["./allpad-api"]
 
-WORKDIR /app
-
-# Copy the project files
+# Java Image
+FROM eclipse-temurin:25-jdk-alpine AS build
+WORKDIR /home/app
 COPY . .
+RUN chmod +x mvnw
+RUN ./mvnw clean package -B -DskipTests --no-transfer-progress
+RUN rm -rf /root/.m2/repository
 
-# Install Maven to avoid using mvnw wrapper which fails in QEMU/ARM64
-RUN microdnf install -y maven findutils
-
-# Build the native image
-# The binary will be created in /app/target/allpad-api
-RUN mvn -Pnative native:compile -e -B -DskipTests --no-transfer-progress
-
-# Stage 2: Create the runtime image
-FROM debian:bookworm-slim
-
-WORKDIR /app
-
-# Copy the binary from the builder stage
-COPY --from=builder /app/target/allpad-api .
-
-# Expose the port the app runs on
-EXPOSE 8080
-
-# Run the binary
-ENTRYPOINT ["./allpad-api"]
+FROM eclipse-temurin:25-jre-alpine AS final
+COPY --from=build /home/app/target/*.jar /usr/local/lib/app.jar
+ENV JAVA_OPTS=""
+ENTRYPOINT [ "sh", "-c", "java $JAVA_OPTS -jar /usr/local/lib/app.jar" ]

@@ -14,14 +14,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Create swap file to avoid OOM during QEMU ARM64 build
-      - name: Create Swap Space
-        run: |
-          sudo dd if=/dev/zero of=/swapfile1 bs=1M count=10240
-          sudo chmod 600 /swapfile1
-          sudo mkswap /swapfile1
-          sudo swapon /swapfile1
-          sudo swapon --show
+#      - name: Create Swap Space
+#        run: |
+#          sudo dd if=/dev/zero of=/swapfile1 bs=1M count=10240
+#          sudo chmod 600 /swapfile1
+#          sudo mkswap /swapfile1
+#          sudo swapon /swapfile1
+#          sudo swapon --show
 
       - name: Prepare
         id: prepare
@@ -29,8 +28,8 @@ jobs:
           echo "docker_image=${DOCKER_USERNAME}/${REPO_NAME}" >> $GITHUB_OUTPUT
           echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+#      - name: Set up QEMU
+#        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
