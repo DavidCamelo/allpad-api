@@ -39,7 +39,7 @@ spec:
                   name: jwt-secret
                   key: secret
             - name: SPRING_JPA_SHOW_SQL
-              value: false
+              value: "false"
           imagePullPolicy: Always
       restartPolicy: Always
   strategy:
