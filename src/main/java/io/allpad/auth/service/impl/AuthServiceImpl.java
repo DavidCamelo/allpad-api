@@ -70,7 +70,7 @@ public class AuthServiceImpl implements AuthService {
     public void recoverPassword(UserDTO userDTO) {
         var user = userService.getUserByUsername(userDTO.email());
         var token = jwtService.generateResetPasswordToken(user.getEmail());
-        log.info("http://localhost:5173/update-password/{}", token);
+        log.info("https://allpad.io/update-password/{}", token);
         // TODO send email with token
     }
 
