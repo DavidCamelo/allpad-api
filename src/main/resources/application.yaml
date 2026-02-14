@@ -22,7 +22,7 @@ spring:
           batch_size: 2
         order_inserts: true
         order_updates: true
-    show-sql: false
+    show_sql: true
 logging:
 #  level:
 #    org.springframework.security: TRACE
