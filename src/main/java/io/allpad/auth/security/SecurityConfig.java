@@ -19,9 +19,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import tools.jackson.databind.json.JsonMapper;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Configuration
@@ -39,7 +43,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JWTFilter jwtFilter) {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
-                //.cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v*/auth/**", "/swagger-ui/**", "/v3/v*/api-docs", "/v3/v*/api-docs/**")
                         .permitAll()
@@ -73,15 +77,15 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
-    /*@Bean
+    @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("https://allpad.io"));
+        configuration.setAllowedOrigins(List.of("http://localhost:5173","https://allpad.io"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
-    }*/
+    }
 }
