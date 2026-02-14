@@ -25,7 +25,7 @@ import java.util.UUID;
 
 @Tag(name = "File API")
 @RestController
-@RequestMapping("/api/{version}/files")
+@RequestMapping(value = "/api/{version}/files", version = "v1")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "authorization")
 public class FileController {

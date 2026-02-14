@@ -23,7 +23,7 @@ import java.util.UUID;
 
 @Tag(name = "History API")
 @RestController
-@RequestMapping("/api/{version}/histories")
+@RequestMapping(value = "/api/{version}/histories", version = "v1")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "authorization")
 public class HistoryController {

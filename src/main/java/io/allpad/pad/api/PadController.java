@@ -24,7 +24,7 @@ import java.util.UUID;
 
 @Tag(name = "Pad API")
 @RestController
-@RequestMapping("/api/{version}/pads")
+@RequestMapping(value = "/api/{version}/pads", version = "v1")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "authorization")
 public class PadController {

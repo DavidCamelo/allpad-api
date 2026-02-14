@@ -20,7 +20,7 @@ import java.util.UUID;
 
 @Tag(name = "Role API")
 @RestController
-@RequestMapping("/api/{version}/roles")
+@RequestMapping(value = "/api/{version}/roles", version = "v1")
 @RequiredArgsConstructor
 public class RoleController {
     private final RoleService roleService;
