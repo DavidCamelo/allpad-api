@@ -44,7 +44,7 @@ public class HistoryController {
         return ResponseEntity.ok(historyService.getAll());
     }
 
-    @Operation(summary = "Get histories", description = "Get histories by pad id and fileId")
+    @Operation(summary = "Get histories", description = "Get histories by pad id and file id")
     @GetMapping(value = "/api/{version}/pads/{padId}/files/{fileId}/histories", version = "v1")
     public ResponseEntity<List<HistoryDTO>> getHistoriesByPadIdAndFileId(@PathVariable UUID padId, @PathVariable UUID fileId) {
         return ResponseEntity.ok(historyService.getHistoriesByPadIdAndFileId(padId, fileId));

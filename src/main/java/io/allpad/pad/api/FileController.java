@@ -45,9 +45,9 @@ public class FileController {
     }
 
     @Operation(summary = "Get files by pad", description = "Get files by pad id")
-    @GetMapping(value = "/api/{version}/pads/{id}/files", version = "v1")
-    public ResponseEntity<List<FileDTO>> getFilesByPadId(@PathVariable UUID id) {
-        return ResponseEntity.ok(fileService.getFilesByPadId(id));
+    @GetMapping(value = "/api/{version}/pads/{padId}/files", version = "v1")
+    public ResponseEntity<List<FileDTO>> getFilesByPadId(@PathVariable UUID padId) {
+        return ResponseEntity.ok(fileService.getFilesByPadId(padId));
     }
 
     @Operation(summary = "Update", description = "Update file")

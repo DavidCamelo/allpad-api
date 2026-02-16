@@ -48,8 +48,8 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public List<FileDTO> getFilesByPadId(UUID id) {
-        return fileMapper.map(fileRepository.findAllByPad(padService.findById(id)));
+    public List<FileDTO> getFilesByPadId(UUID padId) {
+        return fileMapper.map(fileRepository.findAllByPad(padService.findById(padId)));
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")

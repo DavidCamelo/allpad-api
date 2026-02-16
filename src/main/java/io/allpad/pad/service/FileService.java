@@ -13,7 +13,7 @@ public interface FileService {
 
     File findById(UUID id);
 
-    List<FileDTO> getFilesByPadId(UUID id);
+    List<FileDTO> getFilesByPadId(UUID padId);
 
     List<FileDTO> getAll();
 

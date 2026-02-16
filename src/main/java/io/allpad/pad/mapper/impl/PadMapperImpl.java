@@ -21,9 +21,9 @@ public class PadMapperImpl implements PadMapper {
                 .name(pad.getName())
                 .isActive(pad.getIsActive())
                 .lastState(LastStateDTO.builder()
-                        .activeFiles(pad.getLastState().getActiveFiles())
-                        .activePane(pad.getLastState().getActivePane())
-                        .layout(pad.getLastState().getLayout())
+                        .activeFiles(pad.getLastState() != null ? pad.getLastState().getActiveFiles() : null)
+                        .activePane(pad.getLastState() != null ? pad.getLastState().getActivePane() : null)
+                        .layout(pad.getLastState() != null ? pad.getLastState().getLayout() : null)
                         .build())
                 .build();
     }
@@ -35,9 +35,11 @@ public class PadMapperImpl implements PadMapper {
         }
         pad.setName(padDTO.name());
         pad.setIsActive(padDTO.isActive());
-        pad.getLastState().setActiveFiles(padDTO.lastState().activeFiles());
-        pad.getLastState().setActivePane(padDTO.lastState().activePane());
-        pad.getLastState().setLayout(padDTO.lastState().layout());
+        if (padDTO.lastState() != null) {
+            pad.getLastState().setActiveFiles(padDTO.lastState().activeFiles());
+            pad.getLastState().setActivePane(padDTO.lastState().activePane());
+            pad.getLastState().setLayout(padDTO.lastState().layout());
+        }
     }
 
     @Override
