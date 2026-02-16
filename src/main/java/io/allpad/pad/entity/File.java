@@ -1,5 +1,6 @@
 package io.allpad.pad.entity;
 
+import io.allpad.auth.entity.User;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -28,6 +29,9 @@ public class File {
     @ManyToOne
     @JoinColumn(name = "pad_id")
     private Pad pad;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
     private String name;
     @Lob
     private String content;

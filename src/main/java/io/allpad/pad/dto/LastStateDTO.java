@@ -8,7 +8,7 @@ import java.util.Map;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record LastStateDTO(
-        Map<Short, Long> activeFiles,
+        Map<Short, String> activeFiles,
         Short activePane,
         String layout) {
 }

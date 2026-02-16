@@ -1,5 +1,6 @@
 package io.allpad.pad.entity;
 
+import io.allpad.auth.entity.User;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -28,6 +29,9 @@ public class History {
     @ManyToOne
     @JoinColumn(name = "file_id")
     private File file;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
     @Lob
     private String content;
 }

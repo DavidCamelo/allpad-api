@@ -22,7 +22,7 @@ public class LastState {
     @CollectionTable(name = "pad_active_files", joinColumns = @JoinColumn(name = "pad_id"))
     @MapKeyColumn(name = "pane")
     @Column(name = "file_id")
-    private Map<Short, Long> activeFiles = new HashMap<>();
+    private Map<Short, String> activeFiles = new HashMap<>();
     private Short activePane;
     private String layout;
 }

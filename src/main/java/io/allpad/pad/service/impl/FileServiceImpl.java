@@ -2,12 +2,15 @@ package io.allpad.pad.service.impl;
 
 import io.allpad.pad.dto.FileDTO;
 import io.allpad.pad.entity.File;
+import io.allpad.pad.error.AuthException;
 import io.allpad.pad.error.FileNotFoundException;
 import io.allpad.pad.mapper.FileMapper;
 import io.allpad.pad.repository.FileRepository;
 import io.allpad.pad.service.FileService;
 import io.allpad.pad.service.PadService;
+import io.allpad.pad.utils.ContextUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,10 +22,13 @@ public class FileServiceImpl implements FileService {
     private final FileMapper fileMapper;
     private final FileRepository fileRepository;
     private final PadService padService;
+    private final ContextUtils contextUtils;
 
     @Override
     public FileDTO create(FileDTO fileDTO) {
-        return upsert(fileDTO, new File());
+        var file = new File();
+        file.setUser(contextUtils.getUser());
+        return upsert(fileDTO, file);
     }
 
     @Override
@@ -32,8 +38,12 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public File findById(UUID id) {
-        return fileRepository.findById(id)
+        var file = fileRepository.findById(id)
                 .orElseThrow(() -> new FileNotFoundException(String.format("File with id %s not found", id)));
+        if (file.getUser().equals(contextUtils.getUser())) {
+            return file;
+        }
+        throw new AuthException("User not authorized to access this file");
     }
 
     @Override
@@ -41,6 +51,7 @@ public class FileServiceImpl implements FileService {
         return fileMapper.map(fileRepository.findAllByPad(padService.findById(id)));
     }
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @Override
     public List<FileDTO> getAll() {
         return fileMapper.map(fileRepository.findAll());

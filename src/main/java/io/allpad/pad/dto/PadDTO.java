@@ -11,5 +11,6 @@ import java.util.UUID;
 public record PadDTO(
         @JsonProperty(access = JsonProperty.Access.READ_ONLY) UUID id,
         String name,
+        Boolean isActive,
         LastStateDTO lastState) {
 }

@@ -30,6 +30,7 @@ public class Pad {
     @JoinColumn(name = "user_id")
     private User user;
     private String name;
+    private Boolean isActive;
     @Embedded
     private LastState lastState = new LastState();
 }

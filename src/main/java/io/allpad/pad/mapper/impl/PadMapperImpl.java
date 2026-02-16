@@ -19,6 +19,7 @@ public class PadMapperImpl implements PadMapper {
         return PadDTO.builder()
                 .id(pad.getId())
                 .name(pad.getName())
+                .isActive(pad.getIsActive())
                 .lastState(LastStateDTO.builder()
                         .activeFiles(pad.getLastState().getActiveFiles())
                         .activePane(pad.getLastState().getActivePane())
@@ -33,6 +34,7 @@ public class PadMapperImpl implements PadMapper {
             return;
         }
         pad.setName(padDTO.name());
+        pad.setIsActive(padDTO.isActive());
         pad.getLastState().setActiveFiles(padDTO.lastState().activeFiles());
         pad.getLastState().setActivePane(padDTO.lastState().activePane());
         pad.getLastState().setLayout(padDTO.lastState().layout());

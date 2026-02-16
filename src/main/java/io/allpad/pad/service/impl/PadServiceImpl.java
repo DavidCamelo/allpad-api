@@ -35,8 +35,12 @@ public class PadServiceImpl implements PadService {
 
     @Override
     public Pad findById(UUID id) {
-        return padRepository.findById(id)
+        var pad = padRepository.findById(id)
                 .orElseThrow(() -> new PadNotFoundException(String.format("Pad with id %s not found", id)));
+        if (pad.getUser().equals(contextUtils.getUser())) {
+            return pad;
+        }
+        throw new AuthException("User not authorized to access this pad");
     }
 
     @Override
@@ -51,12 +55,7 @@ public class PadServiceImpl implements PadService {
 
     @Override
     public PadDTO update(UUID id, PadDTO padDTO) {
-        var pad = findById(id);
-        var user = contextUtils.getUser();
-        if (pad.getUser().equals(user)) {
-            return upsert(padDTO, findById(id));
-        }
-        throw new AuthException("User not authorized to update this pad");
+        return upsert(padDTO, findById(id));
     }
 
     @Override
