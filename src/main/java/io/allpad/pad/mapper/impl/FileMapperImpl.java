@@ -2,7 +2,6 @@ package io.allpad.pad.mapper.impl;
 
 import io.allpad.pad.dto.FileDTO;
 import io.allpad.pad.entity.File;
-import io.allpad.pad.entity.Pad;
 import io.allpad.pad.mapper.FileMapper;
 import org.springframework.stereotype.Component;
 
@@ -28,11 +27,10 @@ public class FileMapperImpl implements FileMapper {
     }
 
     @Override
-    public void map(FileDTO fileDTO, File file, Pad pad) {
+    public void map(FileDTO fileDTO, File file) {
         if (fileDTO == null || file == null) {
             return;
         }
-        file.setPad(pad);
         file.setName(fileDTO.name());
         file.setContent(fileDTO.content());
         file.setLanguage(fileDTO.language());

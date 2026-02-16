@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,7 +30,9 @@ public class HistoryServiceImpl implements HistoryService {
     @Override
     public HistoryDTO create(HistoryDTO historyDTO) {
         var history = new History();
+        history.setFile(fileService.findById(historyDTO.fileId()));
         history.setUser(contextUtils.getUser());
+        history.setCreatedAt(Instant.now());
         return upsert(historyDTO, history);
     }
 
@@ -74,7 +77,7 @@ public class HistoryServiceImpl implements HistoryService {
     }
 
     private HistoryDTO upsert(HistoryDTO historyDTO, History history) {
-        historyMapper.map(historyDTO, history, fileService.findById(historyDTO.fileId()));
+        historyMapper.map(historyDTO, history);
         return historyMapper.map(historyRepository.save(history));
     }
 }

@@ -14,6 +14,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
 import java.util.UUID;
 
 @Data
@@ -34,4 +35,5 @@ public class History {
     private User user;
     @Lob
     private String content;
+    private Instant createdAt;
 }

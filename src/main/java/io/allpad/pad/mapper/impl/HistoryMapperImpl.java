@@ -1,7 +1,6 @@
 package io.allpad.pad.mapper.impl;
 
 import io.allpad.pad.dto.HistoryDTO;
-import io.allpad.pad.entity.File;
 import io.allpad.pad.entity.History;
 import io.allpad.pad.mapper.HistoryMapper;
 import org.springframework.stereotype.Component;
@@ -20,15 +19,15 @@ public class HistoryMapperImpl implements HistoryMapper {
                 .id(history.getId())
                 .fileId(history.getFile().getId())
                 .content(history.getContent())
+                .createdAt(history.getCreatedAt())
                 .build();
     }
 
     @Override
-    public void map(HistoryDTO historyDTO, History history, File file) {
+    public void map(HistoryDTO historyDTO, History history) {
         if (historyDTO == null || history == null) {
             return;
         }
-        history.setFile(file);
         history.setContent(historyDTO.content());
     }
 

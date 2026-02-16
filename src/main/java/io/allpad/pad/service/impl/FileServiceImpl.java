@@ -27,6 +27,7 @@ public class FileServiceImpl implements FileService {
     @Override
     public FileDTO create(FileDTO fileDTO) {
         var file = new File();
+        file.setPad(padService.findById(fileDTO.padId()));
         file.setUser(contextUtils.getUser());
         return upsert(fileDTO, file);
     }
@@ -68,7 +69,7 @@ public class FileServiceImpl implements FileService {
     }
 
     private FileDTO upsert(FileDTO fileDTO, File file) {
-        fileMapper.map(fileDTO, file, padService.findById(fileDTO.padId()));
+        fileMapper.map(fileDTO, file);
         return fileMapper.map(fileRepository.save(file));
     }
 }
