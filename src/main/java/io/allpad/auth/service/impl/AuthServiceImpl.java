@@ -16,6 +16,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -40,8 +42,8 @@ public class AuthServiceImpl implements AuthService {
             assert user != null;
             return AuthDTO.builder()
                     .user(user.getUserDTO())
-                    .accessTokenExpiration(jwtProperties.accessTokenExpiration())
-                    .refreshTokenExpiration(jwtProperties.refreshTokenExpiration())
+                    .accessTokenExpiration(Instant.now().plusMillis(jwtProperties.accessTokenExpiration()).toEpochMilli())
+                    .refreshTokenExpiration(Instant.now().plusMillis(jwtProperties.refreshTokenExpiration()).toEpochMilli())
                     .accessToken(jwtService.generateAccessToken(userDTO.username(), userDTO.roles()))
                     .refreshToken(refreshTokenService.createRefreshToken(userDTO.username()).getToken())
                     .build();
@@ -59,10 +61,8 @@ public class AuthServiceImpl implements AuthService {
         var userDTO = refreshTokenService.verifyExpiration(tokenDTO.token());
         return AuthDTO.builder()
                 .user(userDTO)
-                .accessTokenExpiration(jwtProperties.accessTokenExpiration())
-                .refreshTokenExpiration(jwtProperties.refreshTokenExpiration())
+                .accessTokenExpiration(Instant.now().plusMillis(jwtProperties.accessTokenExpiration()).toEpochMilli())
                 .accessToken(jwtService.generateAccessToken(userDTO.username(), userDTO.roles()))
-                .refreshToken(tokenDTO.token())
                 .build();
     }
 

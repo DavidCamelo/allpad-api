@@ -19,7 +19,7 @@ public class HistoryMapperImpl implements HistoryMapper {
                 .id(history.getId())
                 .fileId(history.getFile().getId())
                 .content(history.getContent())
-                .createdAt(history.getCreatedAt())
+                .createdAt(history.getCreatedAt().toEpochMilli())
                 .build();
     }
 
