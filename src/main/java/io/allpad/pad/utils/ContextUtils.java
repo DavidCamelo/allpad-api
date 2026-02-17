@@ -1,6 +1,5 @@
 package io.allpad.pad.utils;
 
-import io.allpad.auth.dto.UserDTO;
 import io.allpad.auth.entity.User;
 import io.allpad.auth.security.CustomUserDetails;
 import io.allpad.pad.error.UserNotFoundException;
@@ -19,9 +18,5 @@ public class ContextUtils {
 
     public User getUser() {
         return getCustomUserDetails().getUser();
-    }
-
-    public UserDTO getUserDTO() {
-        return getCustomUserDetails().getUserDTO();
     }
 }

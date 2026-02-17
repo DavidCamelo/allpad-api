@@ -45,10 +45,6 @@ public class PadServiceImpl implements PadService {
 
     @Override
     public List<PadDTO> getAll() {
-        var userDTO = contextUtils.getUserDTO();
-        if (userDTO.roles().contains("ROLE_ADMIN")) {
-            return padMapper.map(padRepository.findAll());
-        }
         var user = contextUtils.getUser();
         return padMapper.map(padRepository.findAllByUser(user));
     }
