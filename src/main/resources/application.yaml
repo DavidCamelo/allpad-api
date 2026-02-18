@@ -31,5 +31,9 @@ logging:
 jwt:
   secret: REPLACE_FOR_THE_REAL_JWT_SECRET
   reset-password-expiration: 900000 # -> 15 minutes
-  access-token-expiration: 3600000 # -> 1 hour
+  access-token-expiration: 600000 # -> 10 minutes
   refresh-token-expiration: 86400000 # -> 1 days
+stripe:
+  secret-key: REPLACE_FOR_THE_REAL_STRIPE_API_KEY
+  public-key: REPLACE_FOR_THE_REAL_STRIPE_PUBLIC_KEY
+  webhook-secret: REPLACE_FOR_THE_REAL_STRIPE_WEBHOOK_SECRET

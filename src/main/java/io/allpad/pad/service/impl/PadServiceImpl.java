@@ -7,7 +7,7 @@ import io.allpad.pad.error.PadNotFoundException;
 import io.allpad.pad.mapper.PadMapper;
 import io.allpad.pad.repository.PadRepository;
 import io.allpad.pad.service.PadService;
-import io.allpad.pad.utils.ContextUtils;
+import io.allpad.auth.utils.ContextUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

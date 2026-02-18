@@ -38,6 +38,21 @@ spec:
                 secretKeyRef:
                   name: jwt-secret
                   key: secret
+            - name: STRIPE_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: stripe-secret-key
+                  key: secret
+            - name: STRIPE_PUBLIC_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: stripe-public-key
+                  key: secret
+            - name: STRIPE_WEBHOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: stripe-webhook-secret
+                  key: secret
             - name: SPRING_JPA_SHOW_SQL
               value: "false"
           imagePullPolicy: Always

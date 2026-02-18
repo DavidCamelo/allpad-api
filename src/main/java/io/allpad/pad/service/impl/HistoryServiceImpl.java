@@ -9,7 +9,7 @@ import io.allpad.pad.repository.HistoryRepository;
 import io.allpad.pad.service.FileService;
 import io.allpad.pad.service.HistoryService;
 import io.allpad.pad.service.PadService;
-import io.allpad.pad.utils.ContextUtils;
+import io.allpad.auth.utils.ContextUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;

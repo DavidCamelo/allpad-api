@@ -1,4 +1,4 @@
-package io.allpad.pad.utils;
+package io.allpad.auth.utils;
 
 import io.allpad.auth.entity.User;
 import io.allpad.auth.security.CustomUserDetails;
