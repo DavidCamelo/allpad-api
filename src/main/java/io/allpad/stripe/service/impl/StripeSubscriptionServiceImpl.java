@@ -11,6 +11,8 @@ import com.stripe.param.CustomerCreateParams;
 import com.stripe.param.CustomerSearchParams;
 import com.stripe.param.SubscriptionCancelParams;
 import com.stripe.param.SubscriptionCreateParams;
+import com.stripe.param.SubscriptionRetrieveParams;
+import com.stripe.param.SubscriptionUpdateParams;
 import io.allpad.auth.entity.User;
 import io.allpad.auth.utils.ContextUtils;
 import io.allpad.stripe.config.StripeProperties;
@@ -45,19 +47,24 @@ public class StripeSubscriptionServiceImpl implements StripeSubscriptionService 
             var user = contextUtils.getUser();
             var customerId = findOrCreateCustomer(user);
             var existingSubscription = stripeSubscriptionRepository.findByUser(user);
-            if (existingSubscription.isPresent() && "active".equals(existingSubscription.get().getStatus())) {
-                throw new StripeSubscriptionException("User already has an active subscription");
+            Subscription subscription;
+            if (existingSubscription.isPresent()) {
+                var stripeSubscription = existingSubscription.get();
+                subscription = getSubscription(stripeSubscription.getStripeSubscriptionId());
+                var priceId = subscription.getItems().getData().getFirst().getPrice().getId();
+                if ("active".equals(subscription.getStatus()) && priceId.equals(stripeSubscription.getPriceId())) {
+                    log.info("User already has the same active subscription");
+                } else if ("incomplete".equals(subscription.getStatus())
+                        && priceId.equals(stripeSubscription.getPriceId())) {
+                    log.info("Retrying the payment subscription");
+                } else if ("canceled".equals(subscription.getStatus())) {
+                    subscription = createSubscription(customerId, stripeSubscriptionDTO);
+                } else {
+                    subscription = downgradeUpgradeSubscription(subscription, stripeSubscriptionDTO);
+                }
+            } else {
+                subscription = createSubscription(customerId, stripeSubscriptionDTO);
             }
-            var params = SubscriptionCreateParams.builder()
-                    .setCustomer(customerId)
-                    .addItem(
-                            SubscriptionCreateParams.Item.builder()
-                                    .setPrice(stripeSubscriptionDTO.priceId())
-                                    .build())
-                    .setPaymentBehavior(SubscriptionCreateParams.PaymentBehavior.DEFAULT_INCOMPLETE)
-                    .addAllExpand(List.of("latest_invoice.payments.data.payment"))
-                    .build();
-            var subscription = Subscription.create(params);
             var stripeSubscription = existingSubscription.orElse(new StripeSubscription());
             stripeSubscription.setUser(user);
             stripeSubscription.setStripeCustomerId(customerId);
@@ -65,22 +72,57 @@ public class StripeSubscriptionServiceImpl implements StripeSubscriptionService 
             stripeSubscription.setPlanId(stripeSubscriptionDTO.planId());
             stripeSubscription.setPriceId(stripeSubscriptionDTO.priceId());
             stripeSubscription.setStatus(subscription.getStatus());
-            stripeSubscription.setCurrentPeriodEnd(subscription.getEndedAt());
+            stripeSubscription.setCurrentPeriodEnd(subscription.getItems().getData().getFirst().getCurrentPeriodEnd());
             stripeSubscriptionRepository.save(stripeSubscription);
             var paymentIntentId = subscription.getLatestInvoiceObject().getPayments().getData().getFirst().getPayment()
                     .getPaymentIntent();
             var paymentIntent = PaymentIntent.retrieve(paymentIntentId);
-            var clientSecret = paymentIntent.getClientSecret();
             return StripeSubscriptionDTO.builder()
                     .planId(stripeSubscription.getPlanId())
                     .priceId(stripeSubscription.getPriceId())
                     .subscriptionId(stripeSubscription.getStripeSubscriptionId())
-                    .clientSecret(clientSecret)
+                    .clientSecret(paymentIntent.getClientSecret())
                     .status(stripeSubscription.getStatus())
                     .build();
         } catch (StripeException e) {
             throw new StripeSubscriptionException(String.format("Failed to create subscription: %s", e.getMessage()));
         }
+    }
+
+    private Subscription getSubscription(String subscriptionId) throws StripeException {
+        var params = SubscriptionRetrieveParams.builder()
+                .addAllExpand(List.of("latest_invoice.payments.data.payment"))
+                .build();
+        return Subscription.retrieve(subscriptionId, params, null);
+    }
+
+    private Subscription createSubscription(String customerId, StripeSubscriptionDTO stripeSubscriptionDTO)
+            throws StripeException {
+        var params = SubscriptionCreateParams.builder()
+                .setCustomer(customerId)
+                .addItem(
+                        SubscriptionCreateParams.Item.builder()
+                                .setPrice(stripeSubscriptionDTO.priceId())
+                                .build())
+                .setPaymentBehavior(SubscriptionCreateParams.PaymentBehavior.DEFAULT_INCOMPLETE)
+                .addAllExpand(List.of("latest_invoice.payments.data.payment"))
+                .build();
+        return Subscription.create(params);
+    }
+
+    private Subscription downgradeUpgradeSubscription(Subscription subscription,
+            StripeSubscriptionDTO stripeSubscriptionDTO) throws StripeException {
+        var params = SubscriptionUpdateParams.builder()
+                .addItem(
+                        SubscriptionUpdateParams.Item.builder()
+                                .setId(stripeSubscriptionDTO.subscriptionId())
+                                .setPrice(stripeSubscriptionDTO.priceId())
+                                .build())
+                .setProrationBehavior(SubscriptionUpdateParams.ProrationBehavior.CREATE_PRORATIONS)
+                .setPaymentBehavior(SubscriptionUpdateParams.PaymentBehavior.DEFAULT_INCOMPLETE)
+                .addAllExpand(List.of("latest_invoice.payments.data.payment"))
+                .build();
+        return subscription.update(params);
     }
 
     @Override
@@ -131,7 +173,7 @@ public class StripeSubscriptionServiceImpl implements StripeSubscriptionService 
         var subscriptionOpt = stripeSubscriptionRepository.findByStripeCustomerId(invoice.getCustomer());
         if (subscriptionOpt.isPresent()) {
             var stripeSubscription = subscriptionOpt.get();
-            stripeSubscription.setStatus("active");
+            stripeSubscription.setInvoiceStatus(invoice.getStatus());
             stripeSubscriptionRepository.save(stripeSubscription);
         }
     }
@@ -143,9 +185,7 @@ public class StripeSubscriptionServiceImpl implements StripeSubscriptionService 
         if (subscriptionOpt.isPresent()) {
             var stripeSubscription = subscriptionOpt.get();
             stripeSubscription.setStatus(subscription.getStatus());
-            stripeSubscription.setCurrentPeriodEnd(subscription.getEndedAt());
-            stripeSubscription.setPlanId(subscription.getItems().getData().getFirst().getPlan().getId());
-            stripeSubscription.setPriceId(subscription.getItems().getData().getFirst().getPrice().getId());
+            stripeSubscription.setCurrentPeriodEnd(subscription.getItems().getData().getFirst().getCurrentPeriodEnd());
             stripeSubscriptionRepository.save(stripeSubscription);
         }
     }
@@ -156,7 +196,8 @@ public class StripeSubscriptionServiceImpl implements StripeSubscriptionService 
         var subscriptionOpt = stripeSubscriptionRepository.findByStripeSubscriptionId(subscription.getId());
         if (subscriptionOpt.isPresent()) {
             var stripeSubscription = subscriptionOpt.get();
-            stripeSubscription.setStatus("canceled");
+            stripeSubscription.setStatus(subscription.getStatus());
+            stripeSubscription.setCurrentPeriodEnd(subscription.getItems().getData().getFirst().getCurrentPeriodEnd());
             stripeSubscriptionRepository.save(stripeSubscription);
         }
     }

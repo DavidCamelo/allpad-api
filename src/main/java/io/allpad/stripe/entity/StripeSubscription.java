@@ -27,5 +27,6 @@ public class StripeSubscription {
     private String planId; // The product ID
     private String priceId; //price ID
     private String status; // active, incomplete, canceled, etc.
+    private String invoiceStatus;
     private Long currentPeriodEnd; // Timestamp for when the current period ends
 }

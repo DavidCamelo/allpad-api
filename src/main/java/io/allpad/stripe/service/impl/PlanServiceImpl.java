@@ -4,11 +4,13 @@ import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Price;
 import com.stripe.model.Product;
+import com.stripe.model.Subscription;
 import com.stripe.param.ProductListParams;
 import io.allpad.auth.utils.ContextUtils;
 import io.allpad.stripe.config.StripeProperties;
 import io.allpad.stripe.dto.PlanDTO;
 import io.allpad.stripe.dto.PlanLimitsDTO;
+import io.allpad.stripe.dto.SubscriptionStatusDTO;
 import io.allpad.stripe.repository.StripeSubscriptionRepository;
 import io.allpad.stripe.service.PlanService;
 import jakarta.annotation.PostConstruct;
@@ -16,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -37,13 +40,21 @@ public class PlanServiceImpl implements PlanService {
     public PlanDTO getCurrentPlan() {
         try {
             var existingSubscription = stripeSubscriptionRepository.findByUser(contextUtils.getUser());
-            if (existingSubscription.isPresent() && "active".equals(existingSubscription.get().getStatus())) {
+            if (existingSubscription.isPresent()) {
                 var stripeSubscription = existingSubscription.get();
-                var product = Product.retrieve(stripeSubscription.getPlanId());
-                return getPlan(product, stripeSubscription.getStripeSubscriptionId());
+                var subscription = Subscription.retrieve(stripeSubscription.getStripeSubscriptionId());
+                var currentPeriodEnd = subscription.getItems().getData().getFirst().getCurrentPeriodEnd();
+                if (Instant.now().isBefore(Instant.ofEpochSecond(currentPeriodEnd))) {
+                    var product = Product.retrieve(stripeSubscription.getPlanId());
+                    var subscriptionStatusDTO = SubscriptionStatusDTO.builder()
+                            .status(subscription.getStatus())
+                            .currentPeriodEnd(currentPeriodEnd)
+                            .build();
+                    return getPlan(product, stripeSubscription.getStripeSubscriptionId(), subscriptionStatusDTO);
+                }
             }
         } catch (StripeException e) {
-            log.error("Failed to get plan: {}", e.getMessage());
+            log.error("Failed to get current plan: {}", e.getMessage());
         }
         return getFreePlan();
     }
@@ -67,16 +78,17 @@ public class PlanServiceImpl implements PlanService {
     }
 
     private PlanDTO getPlan(Product product) {
-        return getPlan(product, null);
+        return getPlan(product, null, null);
     }
 
-    private PlanDTO getPlan(Product product, String subscriptionId) {
+    private PlanDTO getPlan(Product product, String subscriptionId, SubscriptionStatusDTO subscriptionStatusDTO) {
         try {
             var price = Price.retrieve(product.getDefaultPrice());
             return PlanDTO.builder()
                     .id(product.getId())
                     .priceId(price.getId())
                     .subscriptionId(subscriptionId)
+                    .subscriptionStatus(subscriptionStatusDTO)
                     .name(product.getName())
                     .description(product.getDescription())
                     .amount(price.getUnitAmount())

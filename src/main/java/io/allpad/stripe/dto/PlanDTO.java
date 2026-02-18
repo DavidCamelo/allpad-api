@@ -9,6 +9,7 @@ public record PlanDTO(
         String id,
         String priceId,
         String subscriptionId,
+        SubscriptionStatusDTO subscriptionStatus,
         String name,
         String description,
         Long amount,
