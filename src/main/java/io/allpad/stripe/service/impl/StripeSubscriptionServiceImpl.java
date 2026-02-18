@@ -4,6 +4,7 @@ import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Customer;
 import com.stripe.model.Invoice;
+import com.stripe.model.PaymentIntent;
 import com.stripe.model.Subscription;
 import com.stripe.net.Webhook;
 import com.stripe.param.CustomerCreateParams;
@@ -51,31 +52,31 @@ public class StripeSubscriptionServiceImpl implements StripeSubscriptionService 
                     .setCustomer(customerId)
                     .addItem(
                             SubscriptionCreateParams.Item.builder()
-                                    .setPrice(stripeSubscriptionDTO.planId())
+                                    .setPrice(stripeSubscriptionDTO.priceId())
                                     .build())
                     .setPaymentBehavior(SubscriptionCreateParams.PaymentBehavior.DEFAULT_INCOMPLETE)
-                    .addAllExpand(List.of("latest_invoice.payment_intent"))
+                    .addAllExpand(List.of("latest_invoice.payments.data.payment"))
                     .build();
-            var stripeSubscription = Subscription.create(params);
-            var subscription = existingSubscription.orElse(new StripeSubscription());
-            subscription.setUser(user);
-            subscription.setStripeCustomerId(customerId);
-            subscription.setStripeSubscriptionId(stripeSubscription.getId());
-            subscription.setPlanId(stripeSubscriptionDTO.planId());
-            subscription.setStatus(stripeSubscription.getStatus());
-            subscription.setCurrentPeriodEnd(stripeSubscription.getEndedAt());
-            stripeSubscriptionRepository.save(subscription);
-            var clientSecret = "";
-            if (stripeSubscription.getLatestInvoiceObject() != null
-                    && stripeSubscription.getLatestInvoiceObject().getConfirmationSecret() != null
-                    && stripeSubscription.getLatestInvoiceObject().getConfirmationSecret().getClientSecret() != null) {
-                clientSecret = stripeSubscription.getLatestInvoiceObject().getConfirmationSecret().getClientSecret();
-            }
+            var subscription = Subscription.create(params);
+            var stripeSubscription = existingSubscription.orElse(new StripeSubscription());
+            stripeSubscription.setUser(user);
+            stripeSubscription.setStripeCustomerId(customerId);
+            stripeSubscription.setStripeSubscriptionId(subscription.getId());
+            stripeSubscription.setPlanId(stripeSubscriptionDTO.planId());
+            stripeSubscription.setPriceId(stripeSubscriptionDTO.priceId());
+            stripeSubscription.setStatus(subscription.getStatus());
+            stripeSubscription.setCurrentPeriodEnd(subscription.getEndedAt());
+            stripeSubscriptionRepository.save(stripeSubscription);
+            var paymentIntentId = subscription.getLatestInvoiceObject().getPayments().getData().getFirst().getPayment()
+                    .getPaymentIntent();
+            var paymentIntent = PaymentIntent.retrieve(paymentIntentId);
+            var clientSecret = paymentIntent.getClientSecret();
             return StripeSubscriptionDTO.builder()
-                    .subscriptionId(subscription.getPlanId())
+                    .planId(stripeSubscription.getPlanId())
+                    .priceId(stripeSubscription.getPriceId())
+                    .subscriptionId(stripeSubscription.getStripeSubscriptionId())
                     .clientSecret(clientSecret)
-                    .subscriptionId(subscription.getStripeSubscriptionId())
-                    .status(subscription.getStatus())
+                    .status(stripeSubscription.getStatus())
                     .build();
         } catch (StripeException e) {
             throw new StripeSubscriptionException(String.format("Failed to create subscription: %s", e.getMessage()));
@@ -86,13 +87,13 @@ public class StripeSubscriptionServiceImpl implements StripeSubscriptionService 
     public void cancelSubscription() {
         try {
             var user = contextUtils.getUser();
-            var subscription = stripeSubscriptionRepository.findByUser(user)
+            var stripeSubscription = stripeSubscriptionRepository.findByUser(user)
                     .orElseThrow(() -> new StripeSubscriptionException("Subscription not found"));
-            var stripeSubscription = Subscription.retrieve(subscription.getStripeSubscriptionId());
+            var subscription = Subscription.retrieve(stripeSubscription.getStripeSubscriptionId());
             var params = SubscriptionCancelParams.builder().build();
-            var updatedSubscription = stripeSubscription.cancel(params);
-            subscription.setStatus(updatedSubscription.getStatus());
-            stripeSubscriptionRepository.save(subscription);
+            var updatedSubscription = subscription.cancel(params);
+            stripeSubscription.setStatus(updatedSubscription.getStatus());
+            stripeSubscriptionRepository.save(stripeSubscription);
         } catch (StripeException e) {
             throw new StripeSubscriptionException(String.format("Failed to cancel subscription: %s", e.getMessage()));
         }
@@ -125,35 +126,38 @@ public class StripeSubscriptionServiceImpl implements StripeSubscriptionService 
     }
 
     private void handlePaymentSucceeded(Invoice invoice) {
-        if (invoice.getId() == null) {
-            return;
-        }
-        var subscriptionOpt = stripeSubscriptionRepository.findByStripeSubscriptionId(invoice.getId());
+        log.info("Handling payment succeeded for invoice: {}, {}, {}",
+                invoice.getId(), invoice.getCustomer(), invoice.getStatus());
+        var subscriptionOpt = stripeSubscriptionRepository.findByStripeCustomerId(invoice.getCustomer());
         if (subscriptionOpt.isPresent()) {
             var stripeSubscription = subscriptionOpt.get();
             stripeSubscription.setStatus("active");
-            // Optionally update period end from the invoice or fetch subscription
             stripeSubscriptionRepository.save(stripeSubscription);
         }
     }
 
-    private void handleSubscriptionUpdated(Subscription stripeSubscription) {
-        var subscriptionOpt = stripeSubscriptionRepository.findByStripeSubscriptionId(stripeSubscription.getId());
+    private void handleSubscriptionUpdated(Subscription subscription) {
+        log.info("Handling subscription updated for subscription: {}, {}, {}",
+                subscription.getId(), subscription.getCustomer(), subscription.getStatus());
+        var subscriptionOpt = stripeSubscriptionRepository.findByStripeSubscriptionId(subscription.getId());
         if (subscriptionOpt.isPresent()) {
-            var subscription = subscriptionOpt.get();
-            subscription.setStatus(stripeSubscription.getStatus());
-            subscription.setCurrentPeriodEnd(stripeSubscription.getEndedAt());
-            subscription.setPlanId(stripeSubscription.getItems().getData().getFirst().getPrice().getId());
-            stripeSubscriptionRepository.save(subscription);
+            var stripeSubscription = subscriptionOpt.get();
+            stripeSubscription.setStatus(subscription.getStatus());
+            stripeSubscription.setCurrentPeriodEnd(subscription.getEndedAt());
+            stripeSubscription.setPlanId(subscription.getItems().getData().getFirst().getPlan().getId());
+            stripeSubscription.setPriceId(subscription.getItems().getData().getFirst().getPrice().getId());
+            stripeSubscriptionRepository.save(stripeSubscription);
         }
     }
 
-    private void handleSubscriptionDeleted(Subscription stripeSubscription) {
-        var subscriptionOpt = stripeSubscriptionRepository.findByStripeSubscriptionId(stripeSubscription.getId());
+    private void handleSubscriptionDeleted(Subscription subscription) {
+        log.info("Handling subscription deleted for subscription: {}, {}, {}",
+                subscription.getId(), subscription.getCustomer(), subscription.getStatus());
+        var subscriptionOpt = stripeSubscriptionRepository.findByStripeSubscriptionId(subscription.getId());
         if (subscriptionOpt.isPresent()) {
-            StripeSubscription subscription = subscriptionOpt.get();
-            subscription.setStatus("canceled");
-            stripeSubscriptionRepository.save(subscription);
+            var stripeSubscription = subscriptionOpt.get();
+            stripeSubscription.setStatus("canceled");
+            stripeSubscriptionRepository.save(stripeSubscription);
         }
     }
 

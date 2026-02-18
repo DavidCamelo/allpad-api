@@ -7,6 +7,7 @@ import lombok.Builder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record StripeSubscriptionDTO(
         String planId,
+        String priceId,
         String subscriptionId,
         String clientSecret,
         String status) {

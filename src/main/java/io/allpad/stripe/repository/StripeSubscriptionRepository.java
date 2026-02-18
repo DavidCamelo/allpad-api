@@ -12,5 +12,7 @@ import java.util.UUID;
 public interface StripeSubscriptionRepository extends JpaRepository<StripeSubscription, UUID> {
     Optional<StripeSubscription> findByUser(User user);
 
+    Optional<StripeSubscription> findByStripeCustomerId(String stripeCustomerId);
+
     Optional<StripeSubscription> findByStripeSubscriptionId(String stripeSubscriptionId);
 }

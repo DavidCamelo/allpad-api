@@ -15,11 +15,6 @@ import java.time.Instant;
 @RestControllerAdvice(assignableTypes = { StripeSubscriptionController.class, PlanController.class})
 public class StripeSubscriptionControllerAdvice {
 
-    @ExceptionHandler(value = { PlanNotFoundException.class })
-    public ResponseEntity<ErrorDTO> handlePlanNotFoundException(PlanNotFoundException ex) {
-        return buildError(ex, HttpStatus.NOT_FOUND);
-    }
-
     @ExceptionHandler(value = { StripeSubscriptionException.class })
     public ResponseEntity<ErrorDTO> handleStripeSubscriptionException(StripeSubscriptionException ex) {
         return buildError(ex, HttpStatus.INTERNAL_SERVER_ERROR);
