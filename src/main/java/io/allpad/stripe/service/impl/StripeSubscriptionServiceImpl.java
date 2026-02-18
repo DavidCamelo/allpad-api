@@ -51,7 +51,7 @@ public class StripeSubscriptionServiceImpl implements StripeSubscriptionService 
             if (existingSubscription.isPresent()) {
                 var stripeSubscription = existingSubscription.get();
                 subscription = getSubscription(stripeSubscription.getStripeSubscriptionId());
-                var priceId = subscription.getItems().getData().getFirst().getPrice().getId();
+                var priceId = subscription.getItems().getData().getLast().getPrice().getId();
                 if ("active".equals(subscription.getStatus()) && priceId.equals(stripeSubscription.getPriceId())) {
                     log.info("User already has the same active subscription");
                 } else if ("incomplete".equals(subscription.getStatus())
@@ -72,9 +72,9 @@ public class StripeSubscriptionServiceImpl implements StripeSubscriptionService 
             stripeSubscription.setPlanId(stripeSubscriptionDTO.planId());
             stripeSubscription.setPriceId(stripeSubscriptionDTO.priceId());
             stripeSubscription.setStatus(subscription.getStatus());
-            stripeSubscription.setCurrentPeriodEnd(subscription.getItems().getData().getFirst().getCurrentPeriodEnd());
+            stripeSubscription.setCurrentPeriodEnd(subscription.getItems().getData().getLast().getCurrentPeriodEnd());
             stripeSubscriptionRepository.save(stripeSubscription);
-            var paymentIntentId = subscription.getLatestInvoiceObject().getPayments().getData().getFirst().getPayment()
+            var paymentIntentId = subscription.getLatestInvoiceObject().getPayments().getData().getLast().getPayment()
                     .getPaymentIntent();
             var paymentIntent = PaymentIntent.retrieve(paymentIntentId);
             return StripeSubscriptionDTO.builder()
@@ -185,7 +185,7 @@ public class StripeSubscriptionServiceImpl implements StripeSubscriptionService 
         if (subscriptionOpt.isPresent()) {
             var stripeSubscription = subscriptionOpt.get();
             stripeSubscription.setStatus(subscription.getStatus());
-            stripeSubscription.setCurrentPeriodEnd(subscription.getItems().getData().getFirst().getCurrentPeriodEnd());
+            stripeSubscription.setCurrentPeriodEnd(subscription.getItems().getData().getLast().getCurrentPeriodEnd());
             stripeSubscriptionRepository.save(stripeSubscription);
         }
     }
@@ -197,7 +197,7 @@ public class StripeSubscriptionServiceImpl implements StripeSubscriptionService 
         if (subscriptionOpt.isPresent()) {
             var stripeSubscription = subscriptionOpt.get();
             stripeSubscription.setStatus(subscription.getStatus());
-            stripeSubscription.setCurrentPeriodEnd(subscription.getItems().getData().getFirst().getCurrentPeriodEnd());
+            stripeSubscription.setCurrentPeriodEnd(subscription.getItems().getData().getLast().getCurrentPeriodEnd());
             stripeSubscriptionRepository.save(stripeSubscription);
         }
     }
@@ -212,7 +212,7 @@ public class StripeSubscriptionServiceImpl implements StripeSubscriptionService 
                 .build();
         var customers = Customer.search(params);
         if (!customers.getData().isEmpty()) {
-            return customers.getData().getFirst().getId();
+            return customers.getData().getLast().getId();
         }
         var createParams = CustomerCreateParams.builder()
                 .setEmail(user.getEmail())
