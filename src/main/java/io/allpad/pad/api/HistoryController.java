@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,7 +28,9 @@ public class HistoryController {
     @Operation(summary = "Create", description = "Create a new history")
     @PostMapping(value = "/api/{version}/histories", version = "v1")
     public ResponseEntity<HistoryDTO> create(@RequestBody HistoryDTO historyDTO) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(historyService.create(historyDTO));
+        historyDTO = historyService.create(historyDTO);
+        return ResponseEntity.status(historyDTO != null ? HttpStatus.CREATED : HttpStatus.NO_CONTENT)
+                .body(historyDTO);
     }
 
     @Operation(summary = "Get by id", description = "Get history by id")
@@ -38,22 +39,11 @@ public class HistoryController {
         return ResponseEntity.ok(historyService.getById(id));
     }
 
-    @Operation(summary = "Get all", description = "Get all histories")
-    @GetMapping(value = "/api/{version}/histories", version = "v1")
-    public ResponseEntity<List<HistoryDTO>> getAll() {
-        return ResponseEntity.ok(historyService.getAll());
-    }
-
     @Operation(summary = "Get histories", description = "Get histories by pad id and file id")
     @GetMapping(value = "/api/{version}/pads/{padId}/files/{fileId}/histories", version = "v1")
-    public ResponseEntity<List<HistoryDTO>> getHistoriesByPadIdAndFileId(@PathVariable UUID padId, @PathVariable UUID fileId) {
+    public ResponseEntity<List<HistoryDTO>> getHistoriesByPadIdAndFileId(@PathVariable UUID padId,
+            @PathVariable UUID fileId) {
         return ResponseEntity.ok(historyService.getHistoriesByPadIdAndFileId(padId, fileId));
-    }
-
-    @Operation(summary = "Update", description = "Update history")
-    @PutMapping(value = "/api/{version}/histories/{id}", version = "v1")
-    public ResponseEntity<HistoryDTO> update(@PathVariable UUID id, @RequestBody HistoryDTO historyDTO) {
-        return ResponseEntity.ok(historyService.update(id, historyDTO));
     }
 
     @Operation(summary = "Delete", description = "Delete a history by id")

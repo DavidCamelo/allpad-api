@@ -15,8 +15,6 @@ public interface FileService {
 
     List<FileDTO> getFilesByPadId(UUID padId);
 
-    List<FileDTO> getAll();
-
     FileDTO update(UUID id, FileDTO fileDTO);
 
     void delete(UUID id);

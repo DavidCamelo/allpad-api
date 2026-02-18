@@ -1,6 +1,8 @@
 package io.allpad.pad.service.impl;
 
+import io.allpad.auth.utils.ContextUtils;
 import io.allpad.pad.dto.HistoryDTO;
+import io.allpad.pad.entity.File;
 import io.allpad.pad.entity.History;
 import io.allpad.pad.error.AuthException;
 import io.allpad.pad.error.HistoryNotFoundException;
@@ -9,9 +11,7 @@ import io.allpad.pad.repository.HistoryRepository;
 import io.allpad.pad.service.FileService;
 import io.allpad.pad.service.HistoryService;
 import io.allpad.pad.service.PadService;
-import io.allpad.auth.utils.ContextUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -29,11 +29,16 @@ public class HistoryServiceImpl implements HistoryService {
 
     @Override
     public HistoryDTO create(HistoryDTO historyDTO) {
-        var history = new History();
-        history.setFile(fileService.findById(historyDTO.fileId()));
-        history.setUser(contextUtils.getUser());
-        history.setCreatedAt(Instant.now());
-        return upsert(historyDTO, history);
+        var file = fileService.findById(historyDTO.fileId());
+        var historyExists = historyExists(file, historyDTO.content());
+        if (!historyExists) {
+            var history = new History();
+            history.setFile(file);
+            history.setUser(contextUtils.getUser());
+            history.setCreatedAt(Instant.now());
+            return upsert(historyDTO, history);
+        }
+        return null;
     }
 
     @Override
@@ -50,12 +55,6 @@ public class HistoryServiceImpl implements HistoryService {
         throw new AuthException("User not authorized to access this history");
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @Override
-    public List<HistoryDTO> getAll() {
-        return historyMapper.map(historyRepository.findAll());
-    }
-
     @Override
     public List<HistoryDTO> getHistoriesByPadIdAndFileId(UUID padId, UUID fileId) {
         var pad = padService.findById(padId);
@@ -67,11 +66,6 @@ public class HistoryServiceImpl implements HistoryService {
     }
 
     @Override
-    public HistoryDTO update(UUID id, HistoryDTO historyDTO) {
-        return upsert(historyDTO, findById(id));
-    }
-
-    @Override
     public void delete(UUID id) {
         historyRepository.delete(findById(id));
     }
@@ -79,5 +73,10 @@ public class HistoryServiceImpl implements HistoryService {
     private HistoryDTO upsert(HistoryDTO historyDTO, History history) {
         historyMapper.map(historyDTO, history);
         return historyMapper.map(historyRepository.save(history));
+    }
+
+    private Boolean historyExists(File file, String content) {
+        var histories = historyRepository.findAllByFile(file);
+        return histories.stream().anyMatch(history -> history.getContent().equals(content));
     }
 }

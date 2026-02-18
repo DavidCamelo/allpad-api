@@ -5,6 +5,7 @@ import io.allpad.pad.entity.History;
 import io.allpad.pad.mapper.HistoryMapper;
 import org.springframework.stereotype.Component;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Component
@@ -33,6 +34,6 @@ public class HistoryMapperImpl implements HistoryMapper {
 
     @Override
     public List<HistoryDTO> map(List<History> historyList) {
-        return historyList.stream().map(this::map).toList();
+        return historyList.stream().map(this::map).sorted(Comparator.comparing(HistoryDTO::createdAt)).toList();
     }
 }

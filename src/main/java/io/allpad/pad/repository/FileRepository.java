@@ -1,5 +1,6 @@
 package io.allpad.pad.repository;
 
+import io.allpad.pad.dto.TinyFileDTO;
 import io.allpad.pad.entity.File;
 import io.allpad.pad.entity.Pad;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,5 +11,5 @@ import java.util.UUID;
 
 @Repository
 public interface FileRepository extends JpaRepository<File, UUID> {
-    List<File> findAllByPad(Pad pad);
+    List<TinyFileDTO> findAllByPad(Pad pad);
 }

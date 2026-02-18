@@ -10,11 +10,7 @@ public interface HistoryService {
 
     HistoryDTO getById(UUID id);
 
-    List<HistoryDTO> getAll();
-
     List<HistoryDTO> getHistoriesByPadIdAndFileId(UUID padId, UUID fileId);
-
-    HistoryDTO update(UUID id, HistoryDTO historyDTO);
 
     void delete(UUID id);
 }

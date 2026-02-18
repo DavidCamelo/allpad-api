@@ -1,5 +1,6 @@
 package io.allpad.pad.service.impl;
 
+import io.allpad.auth.utils.ContextUtils;
 import io.allpad.pad.dto.FileDTO;
 import io.allpad.pad.entity.File;
 import io.allpad.pad.error.AuthException;
@@ -8,9 +9,7 @@ import io.allpad.pad.mapper.FileMapper;
 import io.allpad.pad.repository.FileRepository;
 import io.allpad.pad.service.FileService;
 import io.allpad.pad.service.PadService;
-import io.allpad.auth.utils.ContextUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -49,13 +48,21 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public List<FileDTO> getFilesByPadId(UUID padId) {
-        return fileMapper.map(fileRepository.findAllByPad(padService.findById(padId)));
-    }
-
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @Override
-    public List<FileDTO> getAll() {
-        return fileMapper.map(fileRepository.findAll());
+        var pad = padService.findById(padId);
+        var tinyFileDTOList = fileRepository.findAllByPad(pad);
+        return tinyFileDTOList.stream().map(tinyFileDTO -> {
+            if (pad.getLastState().getActiveFiles().values().stream()
+                    .anyMatch(fileId -> fileId.equals(tinyFileDTO.id().toString()))) {
+                return fileMapper.map(findById(tinyFileDTO.id()));
+            }
+            return FileDTO.builder()
+                    .id(tinyFileDTO.id())
+                    .padId(tinyFileDTO.padId())
+                    .name(tinyFileDTO.name())
+                    .pane(tinyFileDTO.pane())
+                    .isOpen(tinyFileDTO.isOpen())
+                    .build();
+        }).toList();
     }
 
     @Override

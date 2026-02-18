@@ -110,11 +110,11 @@ public class StripeSubscriptionServiceImpl implements StripeSubscriptionService 
                 case "invoice.payment_succeeded":
                     handlePaymentSucceeded((Invoice) stripeObject);
                     break;
-                case "customer.subscription.deleted":
-                    handleSubscriptionDeleted((Subscription) stripeObject);
-                    break;
                 case "customer.subscription.updated":
                     handleSubscriptionUpdated((Subscription) stripeObject);
+                    break;
+                case "customer.subscription.deleted":
+                    handleSubscriptionDeleted((Subscription) stripeObject);
                     break;
                 default:
                     log.info("Unhandled event type: {}", event.getType());
