@@ -22,6 +22,7 @@ public class UserMapperImpl implements UserMapper {
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .password(password)
+                .encryptionKey(user.getEncryptionKey())
                 .roles(user.getRoles().stream().map(Role::getName).toList())
                 .build();
     }

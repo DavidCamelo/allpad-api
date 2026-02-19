@@ -1,6 +1,8 @@
 package io.allpad.pad.service.impl;
 
 import io.allpad.auth.utils.ContextUtils;
+import io.allpad.auth.utils.EncryptionUtils;
+import io.allpad.auth.utils.LZStringUtils;
 import io.allpad.pad.dto.HistoryDTO;
 import io.allpad.pad.entity.File;
 import io.allpad.pad.entity.History;
@@ -12,12 +14,14 @@ import io.allpad.pad.service.FileService;
 import io.allpad.pad.service.HistoryService;
 import io.allpad.pad.service.PadService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class HistoryServiceImpl implements HistoryService {
@@ -77,6 +81,16 @@ public class HistoryServiceImpl implements HistoryService {
 
     private Boolean historyExists(File file, String content) {
         var histories = historyRepository.findAllByFile(file);
-        return histories.stream().anyMatch(history -> history.getContent().equals(content));
+        var encryptionKey = file.getUser().getEncryptionKey();
+        return histories.stream().anyMatch(history -> {
+            var existingContent = EncryptionUtils.decryptContent(encryptionKey, history.getContent());
+            var newContent = EncryptionUtils.decryptContent(encryptionKey, content);
+            existingContent = LZStringUtils.decompressFromUTF16(existingContent);
+            newContent = LZStringUtils.decompressFromUTF16(newContent);
+            if (existingContent != null && newContent != null) {
+                return existingContent.equals(newContent);
+            }
+            return history.getContent().equals(content);
+        });
     }
 }

@@ -8,6 +8,7 @@ import io.allpad.auth.mapper.UserMapper;
 import io.allpad.auth.repository.UserRepository;
 import io.allpad.auth.service.RoleService;
 import io.allpad.auth.service.UserService;
+import io.allpad.auth.utils.EncryptionUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,7 @@ public class UserServiceImpl implements UserService {
                 .lastName(userDTO.lastName())
                 .email(userDTO.email())
                 .username(userDTO.email().split("@")[0])
+                .encryptionKey(EncryptionUtils.createEncryptionKey())
                 .password(passwordEncoder.encode(userDTO.password()))
                 .roles(Set.of(userRole))
                 .build();
