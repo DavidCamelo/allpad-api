@@ -4,7 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.Base64;
 
@@ -12,7 +15,7 @@ import java.util.Base64;
 public class EncryptionUtils {
     private static final String ALGORITHM = "AES";
 
-    public static String createEncryptionKey() {
+    public static String createSecretKey() {
         try {
             var keyGenerator = KeyGenerator.getInstance(ALGORITHM);
             var secureRandom = new SecureRandom();
@@ -25,15 +28,15 @@ public class EncryptionUtils {
         return null;
     }
 
-    public static String decryptContent(String passphrase, String encryptedBase64) {
+    public static String decryptContent(String secretKey, String encryptedContent) {
         try {
-            var encryptedBytes = Base64.getDecoder().decode(encryptedBase64);
+            var encryptedBytes = Base64.getDecoder().decode(encryptedContent);
             var salt = new byte[8];
             System.arraycopy(encryptedBytes, 8, salt, 0, 8);
             var content = new byte[encryptedBytes.length - 16];
             System.arraycopy(encryptedBytes, 16, content, 0, content.length);
-            var pass = passphrase.getBytes(StandardCharsets.UTF_8);
-            var md5 = java.security.MessageDigest.getInstance("MD5");
+            var pass = secretKey.getBytes(StandardCharsets.UTF_8);
+            var md5 = MessageDigest.getInstance("MD5");
             var dx = new byte[0];
             var saltedBytes = new byte[48];
             var saltedBytesIndex = 0;
@@ -51,9 +54,9 @@ public class EncryptionUtils {
             var iv = new byte[16];
             System.arraycopy(saltedBytes, 0, key, 0, 32);
             System.arraycopy(saltedBytes, 32, iv, 0, 16);
-            var cipher = javax.crypto.Cipher.getInstance("AES/CBC/PKCS5Padding");
-            var keySpec = new javax.crypto.spec.SecretKeySpec(key, "AES");
-            var ivSpec = new javax.crypto.spec.IvParameterSpec(iv);
+            var cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            var keySpec = new SecretKeySpec(key, ALGORITHM);
+            var ivSpec = new IvParameterSpec(iv);
             cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
             var decryptedBytes = cipher.doFinal(content);
             return new String(decryptedBytes, StandardCharsets.UTF_8);

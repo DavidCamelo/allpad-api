@@ -1,5 +1,6 @@
 package io.allpad.pad.repository;
 
+import io.allpad.pad.dto.TinyHistoryDTO;
 import io.allpad.pad.entity.File;
 import io.allpad.pad.entity.History;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,5 +11,5 @@ import java.util.UUID;
 
 @Repository
 public interface HistoryRepository extends JpaRepository<History, UUID> {
-    List<History> findAllByFile(File file);
+    List<TinyHistoryDTO> findAllByFile(File file);
 }

@@ -28,12 +28,6 @@ public class InitUsersAndRoles {
             createUser(userRepository, passwordEncoder, admin, Set.of(adminRole, modRole, userRole));
             createUser(userRepository, passwordEncoder, mod, Set.of(modRole, userRole));
             createUser(userRepository, passwordEncoder, user, Set.of(userRole));
-            userRepository.findAll().stream()
-                    .filter(usr -> usr.getEncryptionKey() == null)
-                    .forEach(usr -> {
-                        usr.setEncryptionKey(EncryptionUtils.createEncryptionKey());
-                        userRepository.save(usr);
-                    });
         };
     }
 
@@ -51,7 +45,7 @@ public class InitUsersAndRoles {
                     .email(username + "@allpad.io")
                     .username(username)
                     .password(passwordEncoder.encode(username + "_password"))
-                    .encryptionKey(EncryptionUtils.createEncryptionKey())
+                    .encryptionKey(EncryptionUtils.createSecretKey())
                     .roles(roles)
                     .build();
             userRepository.save(user);

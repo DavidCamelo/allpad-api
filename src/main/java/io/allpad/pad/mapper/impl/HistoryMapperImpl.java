@@ -34,6 +34,6 @@ public class HistoryMapperImpl implements HistoryMapper {
 
     @Override
     public List<HistoryDTO> map(List<History> historyList) {
-        return historyList.stream().map(this::map).sorted(Comparator.comparing(HistoryDTO::createdAt)).toList();
+        return historyList.stream().map(this::map).sorted(Comparator.comparing(HistoryDTO::createdAt).reversed()).toList();
     }
 }

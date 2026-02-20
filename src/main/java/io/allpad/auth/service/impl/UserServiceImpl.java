@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService {
                 .lastName(userDTO.lastName())
                 .email(userDTO.email())
                 .username(userDTO.email().split("@")[0])
-                .encryptionKey(EncryptionUtils.createEncryptionKey())
+                .encryptionKey(EncryptionUtils.createSecretKey())
                 .password(passwordEncoder.encode(userDTO.password()))
                 .roles(Set.of(userRole))
                 .build();

@@ -4,6 +4,7 @@ import io.allpad.auth.utils.ContextUtils;
 import io.allpad.auth.utils.EncryptionUtils;
 import io.allpad.auth.utils.LZStringUtils;
 import io.allpad.pad.dto.HistoryDTO;
+import io.allpad.pad.dto.TinyHistoryDTO;
 import io.allpad.pad.entity.File;
 import io.allpad.pad.entity.History;
 import io.allpad.pad.error.AuthException;
@@ -13,11 +14,13 @@ import io.allpad.pad.repository.HistoryRepository;
 import io.allpad.pad.service.FileService;
 import io.allpad.pad.service.HistoryService;
 import io.allpad.pad.service.PadService;
+import io.allpad.stripe.service.PlanService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,6 +32,7 @@ public class HistoryServiceImpl implements HistoryService {
     private final HistoryRepository historyRepository;
     private final FileService fileService;
     private final PadService padService;
+    private final PlanService planService;
     private final ContextUtils contextUtils;
 
     @Override
@@ -64,7 +68,30 @@ public class HistoryServiceImpl implements HistoryService {
         var pad = padService.findById(padId);
         var file = fileService.findById(fileId);
         if (file.getPad().equals(pad)) {
-            return historyMapper.map(historyRepository.findAllByFile(file));
+            var histories = historyRepository.findAllByFile(file);
+            var planDTO = planService.getCurrentPlan();
+            var limit = planDTO.planLimits().historiesPerFile();
+            boolean[] isFirst = {true};
+            return histories.stream()
+                    .sorted(Comparator.comparing(TinyHistoryDTO::createdAt).reversed())
+                    .limit(limit)
+                    .map(tinyHistoryDTO -> {
+                        if (isFirst[0]) {
+                            isFirst[0] = false;
+                            var history = historyRepository.findById(tinyHistoryDTO.id()).orElse(new History());
+                            return HistoryDTO.builder()
+                                    .id(tinyHistoryDTO.id())
+                                    .fileId(tinyHistoryDTO.fileId())
+                                    .content(history.getContent())
+                                    .createdAt(tinyHistoryDTO.createdAt().toEpochMilli())
+                                    .build();
+                        }
+                        return HistoryDTO.builder()
+                                .id(tinyHistoryDTO.id())
+                                .fileId(tinyHistoryDTO.fileId())
+                                .createdAt(tinyHistoryDTO.createdAt().toEpochMilli())
+                                .build();
+            }).toList();
         }
         throw new AuthException("User not authorized to access this history");
     }
@@ -82,7 +109,8 @@ public class HistoryServiceImpl implements HistoryService {
     private Boolean historyExists(File file, String content) {
         var histories = historyRepository.findAllByFile(file);
         var encryptionKey = file.getUser().getEncryptionKey();
-        return histories.stream().anyMatch(history -> {
+        return histories.stream().anyMatch(tinyHistoryDTO -> {
+            var history = historyRepository.findById(tinyHistoryDTO.id()).orElse(new History());
             var existingContent = EncryptionUtils.decryptContent(encryptionKey, history.getContent());
             var newContent = EncryptionUtils.decryptContent(encryptionKey, content);
             existingContent = LZStringUtils.decompressFromUTF16(existingContent);
