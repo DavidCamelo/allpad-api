@@ -5,7 +5,7 @@ import lombok.Builder;
 
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record PistonCredentialsDTO(
+public record PistonDTO(
         String user,
-        String password) {
+        String id) {
 }

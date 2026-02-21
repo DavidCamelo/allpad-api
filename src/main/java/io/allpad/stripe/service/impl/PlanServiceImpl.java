@@ -9,7 +9,7 @@ import com.stripe.param.ProductListParams;
 import io.allpad.auth.utils.ContextUtils;
 import io.allpad.stripe.config.PistonProperties;
 import io.allpad.stripe.config.StripeProperties;
-import io.allpad.stripe.dto.PistonCredentialsDTO;
+import io.allpad.stripe.dto.PistonDTO;
 import io.allpad.stripe.dto.PlanDTO;
 import io.allpad.stripe.dto.PlanLimitsDTO;
 import io.allpad.stripe.dto.SubscriptionStatusDTO;
@@ -99,7 +99,7 @@ public class PlanServiceImpl implements PlanService {
                     .currency(price.getCurrency())
                     .interval(price.getRecurring().getInterval())
                     .planLimits(getPlanLimits(product.getName()))
-                    .pistonCredentials(getPistonCredentialsDTO())
+                    .piston(getPiston())
                     .build();
         } catch (StripeException e) {
             log.error("Failed to get plan: {}", e.getMessage());
@@ -118,7 +118,7 @@ public class PlanServiceImpl implements PlanService {
                 .currency("usd")
                 .interval("month")
                 .planLimits(getPlanLimits("Free"))
-                .pistonCredentials(getPistonCredentialsDTO())
+                .piston(getPiston())
                 .build();
     }
 
@@ -132,10 +132,10 @@ public class PlanServiceImpl implements PlanService {
         };
     }
 
-    private PistonCredentialsDTO getPistonCredentialsDTO() {
-        return PistonCredentialsDTO.builder()
+    private PistonDTO getPiston() {
+        return PistonDTO.builder()
                 .user(pistonProperties.user())
-                .password(pistonProperties.password())
+                .id(pistonProperties.password())
                 .build();
     }
 }
