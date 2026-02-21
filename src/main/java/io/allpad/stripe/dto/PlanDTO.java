@@ -16,5 +16,6 @@ public record PlanDTO(
         Long unitAmount,
         String currency,
         String interval,
-        PlanLimitsDTO planLimits) {
+        PlanLimitsDTO planLimits,
+        PistonCredentialsDTO pistonCredentials) {
 }

@@ -53,6 +53,16 @@ spec:
                 secretKeyRef:
                   name: stripe-webhook-secret
                   key: secret
+            - name: PISTON_USER
+              valueFrom:
+                secretKeyRef:
+                  name: piston-user
+                  key: secret
+            - name: PISTON_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: piston-password
+                  key: secret
             - name: SPRING_JPA_SHOW_SQL
               value: "false"
           imagePullPolicy: Always

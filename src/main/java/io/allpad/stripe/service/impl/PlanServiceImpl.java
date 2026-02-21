@@ -7,7 +7,9 @@ import com.stripe.model.Product;
 import com.stripe.model.Subscription;
 import com.stripe.param.ProductListParams;
 import io.allpad.auth.utils.ContextUtils;
+import io.allpad.stripe.config.PistonProperties;
 import io.allpad.stripe.config.StripeProperties;
+import io.allpad.stripe.dto.PistonCredentialsDTO;
 import io.allpad.stripe.dto.PlanDTO;
 import io.allpad.stripe.dto.PlanLimitsDTO;
 import io.allpad.stripe.dto.SubscriptionStatusDTO;
@@ -27,6 +29,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class PlanServiceImpl implements PlanService {
+    private final PistonProperties pistonProperties;
     private final StripeProperties stripeProperties;
     private final StripeSubscriptionRepository stripeSubscriptionRepository;
     private final ContextUtils contextUtils;
@@ -96,6 +99,7 @@ public class PlanServiceImpl implements PlanService {
                     .currency(price.getCurrency())
                     .interval(price.getRecurring().getInterval())
                     .planLimits(getPlanLimits(product.getName()))
+                    .pistonCredentials(getPistonCredentialsDTO())
                     .build();
         } catch (StripeException e) {
             log.error("Failed to get plan: {}", e.getMessage());
@@ -114,6 +118,7 @@ public class PlanServiceImpl implements PlanService {
                 .currency("usd")
                 .interval("month")
                 .planLimits(getPlanLimits("Free"))
+                .pistonCredentials(getPistonCredentialsDTO())
                 .build();
     }
 
@@ -125,5 +130,12 @@ public class PlanServiceImpl implements PlanService {
             case "Premium" -> PlanLimitsDTO.builder().pads(100).filesPerPad(100).historiesPerFile(100).build();
             default -> null;
         };
+    }
+
+    private PistonCredentialsDTO getPistonCredentialsDTO() {
+        return PistonCredentialsDTO.builder()
+                .user(pistonProperties.user())
+                .password(pistonProperties.password())
+                .build();
     }
 }
