@@ -17,7 +17,7 @@ import java.util.List;
 
 @Tag(name = "User API")
 @RestController
-@RequestMapping(value = "/api/{version}/users", version = "v1")
+@RequestMapping(value = "api/{version}/users", version = "v1")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
@@ -29,13 +29,13 @@ public class UserController {
     }
 
     @Operation(summary = "Assign role to user", description = "Assign role to user")
-    @PostMapping("/{username}/roles/{roleName}")
+    @PostMapping("{username}/roles/{roleName}")
     public ResponseEntity<UserDTO> assignRoleToUser(@PathVariable String username, @PathVariable String roleName) {
         return ResponseEntity.ok(userService.assignRoleToUser(username, roleName));
     }
 
     @Operation(summary = "Remove role from user", description = "Remove role from user")
-    @DeleteMapping("/{username}/roles/{roleName}")
+    @DeleteMapping("{username}/roles/{roleName}")
     public ResponseEntity<UserDTO> removeRoleFromUser(@PathVariable String username, @PathVariable String roleName) {
         return ResponseEntity.ok(userService.removeRoleFromUser(username, roleName));
     }

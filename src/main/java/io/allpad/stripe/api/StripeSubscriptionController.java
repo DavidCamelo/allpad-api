@@ -16,26 +16,26 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Stripe API")
 @RestController
-@RequestMapping(value = "/api/{version}/stripe", version = "v1")
+@RequestMapping(value = "api/{version}/stripe", version = "v1")
 @RequiredArgsConstructor
 public class StripeSubscriptionController {
     private final StripeSubscriptionService stripeSubscriptionService;
 
     @Operation(summary = "Create subscription", description = "Create subscription")
-    @PostMapping("/subscription")
+    @PostMapping("subscription")
     public ResponseEntity<StripeSubscriptionDTO> createSubscription(@RequestBody StripeSubscriptionDTO stripeSubscriptionDTO) {
         return ResponseEntity.ok(stripeSubscriptionService.createSubscription(stripeSubscriptionDTO));
     }
 
     @Operation(summary = "Cancel subscription", description = "Cancel subscription")
-    @DeleteMapping("/subscription")
+    @DeleteMapping("subscription")
     public ResponseEntity<Void> cancelSubscription() {
         stripeSubscriptionService.cancelSubscription();
         return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "Stripe Webhook", description = "Handle Stripe Webhook events")
-    @PostMapping("/webhook")
+    @PostMapping("webhook")
     public void handleWebhook(@RequestBody String payload, @RequestHeader("Stripe-Signature") String sigHeader) {
         stripeSubscriptionService.handleWebhook(payload, sigHeader);
     }

@@ -53,6 +53,11 @@ spec:
                 secretKeyRef:
                   name: stripe-webhook-secret
                   key: secret
+            - name: PISTON_URL
+              valueFrom:
+                secretKeyRef:
+                  name: piston-url
+                  key: secret
             - name: PISTON_USER
               valueFrom:
                 secretKeyRef:

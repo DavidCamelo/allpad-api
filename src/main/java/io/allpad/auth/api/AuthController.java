@@ -16,45 +16,45 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Auth API")
 @RestController
-@RequestMapping(value = "/api/{version}/auth", version = "v1")
+@RequestMapping(value = "api/{version}/auth", version = "v1")
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;
 
     @Operation(summary = "Sign up", description = "User Sign Up")
-    @PostMapping("/signup")
+    @PostMapping("signup")
     public ResponseEntity<AuthDTO> signUp(@RequestBody UserDTO userDTO) {
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.signUp(userDTO));
     }
 
     @Operation(summary = "Login", description = "User login authentication")
-    @PostMapping("/login")
+    @PostMapping("login")
     public ResponseEntity<AuthDTO> login(@RequestBody UserDTO userDTO) {
         return ResponseEntity.ok(authService.login(userDTO));
     }
 
     @Operation(summary = "Logout", description = "User logout")
-    @PostMapping("/logout")
+    @PostMapping("logout")
     public ResponseEntity<Void> logout(@RequestBody TokenDTO tokenDTO) {
         authService.logout(tokenDTO);
         return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "Refresh", description = "Refresh token")
-    @PostMapping("/refresh")
+    @PostMapping("refresh")
     public ResponseEntity<AuthDTO> refresh(@RequestBody TokenDTO tokenDTO) {
         return ResponseEntity.ok(authService.refreshToken(tokenDTO));
     }
 
     @Operation(summary = "Recover password", description = "User recover password")
-    @PostMapping("/recover-password")
+    @PostMapping("recover-password")
     public ResponseEntity<Void> recoverPassword(@RequestBody UserDTO userDTO) {
         authService.recoverPassword(userDTO);
         return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "Update password", description = "User update password")
-    @PostMapping("/update-password")
+    @PostMapping("update-password")
     public ResponseEntity<Void> updatePassword(@RequestBody TokenDTO tokenDTO) {
         authService.updatePassword(tokenDTO);
         return ResponseEntity.noContent().build();

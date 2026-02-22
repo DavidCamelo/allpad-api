@@ -14,13 +14,13 @@ import java.util.List;
 
 @Tag(name = "Plans API")
 @RestController
-@RequestMapping(value = "/api/{version}/plans", version = "v1")
+@RequestMapping(value = "api/{version}/plans", version = "v1")
 @RequiredArgsConstructor
 public class PlanController {
     private final PlanService planService;
 
     @Operation(summary = "Get current plan", description = "Get current plan of the authenticated user")
-    @GetMapping("/current")
+    @GetMapping("current")
     public ResponseEntity<PlanDTO> getCurrentPlan() {
         return ResponseEntity.ok(planService.getCurrentPlan());
     }

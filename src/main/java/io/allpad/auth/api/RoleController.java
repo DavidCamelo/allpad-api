@@ -20,7 +20,7 @@ import java.util.UUID;
 
 @Tag(name = "Role API")
 @RestController
-@RequestMapping(value = "/api/{version}/roles", version = "v1")
+@RequestMapping(value = "api/{version}/roles", version = "v1")
 @RequiredArgsConstructor
 public class RoleController {
     private final RoleService roleService;
@@ -38,7 +38,7 @@ public class RoleController {
     }
 
     @Operation(summary = "Delete", description = "Delete a role by id")
-    @DeleteMapping("/{id}")
+    @DeleteMapping("{id}")
     public ResponseEntity<Void> deleteRole(@PathVariable UUID id) {
         roleService.delete(id);
         return ResponseEntity.noContent().build();

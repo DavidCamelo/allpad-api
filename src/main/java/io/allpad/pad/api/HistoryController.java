@@ -3,7 +3,6 @@ package io.allpad.pad.api;
 import io.allpad.pad.dto.HistoryDTO;
 import io.allpad.pad.service.HistoryService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,12 +20,11 @@ import java.util.UUID;
 @Tag(name = "History API")
 @RestController
 @RequiredArgsConstructor
-@SecurityRequirement(name = "authorization")
 public class HistoryController {
     private final HistoryService historyService;
 
     @Operation(summary = "Create", description = "Create a new history")
-    @PostMapping(value = "/api/{version}/histories", version = "v1")
+    @PostMapping(value = "api/{version}/histories", version = "v1")
     public ResponseEntity<HistoryDTO> create(@RequestBody HistoryDTO historyDTO) {
         historyDTO = historyService.create(historyDTO);
         return ResponseEntity.status(historyDTO != null ? HttpStatus.CREATED : HttpStatus.NO_CONTENT)
@@ -34,20 +32,20 @@ public class HistoryController {
     }
 
     @Operation(summary = "Get by id", description = "Get history by id")
-    @GetMapping(value = "/api/{version}/histories/{id}", version = "v1")
+    @GetMapping(value = "api/{version}/histories/{id}", version = "v1")
     public ResponseEntity<HistoryDTO> getById(@PathVariable UUID id) {
         return ResponseEntity.ok(historyService.getById(id));
     }
 
     @Operation(summary = "Get histories", description = "Get histories by pad id and file id")
-    @GetMapping(value = "/api/{version}/pads/{padId}/files/{fileId}/histories", version = "v1")
+    @GetMapping(value = "api/{version}/pads/{padId}/files/{fileId}/histories", version = "v1")
     public ResponseEntity<List<HistoryDTO>> getHistoriesByPadIdAndFileId(@PathVariable UUID padId,
             @PathVariable UUID fileId) {
         return ResponseEntity.ok(historyService.getHistoriesByPadIdAndFileId(padId, fileId));
     }
 
     @Operation(summary = "Delete", description = "Delete a history by id")
-    @DeleteMapping(value = "/api/{version}/histories/{id}", version = "v1")
+    @DeleteMapping(value = "api/{version}/histories/{id}", version = "v1")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         historyService.delete(id);
         return ResponseEntity.noContent().build();
