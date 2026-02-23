@@ -1,13 +1,11 @@
 package io.allpad.piston.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Builder;
 
-import java.util.List;
-
+@Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record RuntimeDTO(
+public record PackageRequestDTO(
         String language,
-        String version,
-        List<String> aliases,
-        String runtime) {
+        String version) {
 }

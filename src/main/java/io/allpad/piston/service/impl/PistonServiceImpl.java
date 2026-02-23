@@ -2,6 +2,7 @@ package io.allpad.piston.service.impl;
 
 import io.allpad.piston.dto.ExecuteDTO;
 import io.allpad.piston.dto.PackageDTO;
+import io.allpad.piston.dto.PackageRequestDTO;
 import io.allpad.piston.dto.RuntimeDTO;
 import io.allpad.piston.service.PistonService;
 import io.allpad.piston.utils.http.PistonClient;
@@ -50,13 +51,13 @@ public class PistonServiceImpl implements PistonService {
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @Override
-    public PackageDTO installPackage(PackageDTO packageDTO) {
-        return pistonClient.installPackage(packageDTO);
+    public PackageDTO installPackage(PackageRequestDTO packageRequestDTO) {
+        return pistonClient.installPackage(packageRequestDTO);
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @Override
-    public PackageDTO uninstallPackage(PackageDTO packageDTO) {
-        return pistonClient.uninstallPackage(packageDTO);
+    public PackageDTO uninstallPackage(PackageRequestDTO packageRequestDTO) {
+        return pistonClient.uninstallPackage(packageRequestDTO);
     }
 }

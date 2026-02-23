@@ -2,6 +2,7 @@ package io.allpad.piston.utils.http;
 
 import io.allpad.piston.dto.ExecuteDTO;
 import io.allpad.piston.dto.PackageDTO;
+import io.allpad.piston.dto.PackageRequestDTO;
 import io.allpad.piston.dto.PackageResponseDTO;
 import io.allpad.piston.dto.RuntimeDTO;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,7 +22,7 @@ public interface PistonClient {
     @GetExchange("packages")
     List<PackageResponseDTO> getPackages();
     @PostExchange("packages")
-    PackageDTO installPackage(@RequestBody PackageDTO packageDTO);
+    PackageDTO installPackage(@RequestBody PackageRequestDTO packageRequestDTO);
     @DeleteExchange("packages")
-    PackageDTO uninstallPackage(@RequestBody PackageDTO packageDTO);
+    PackageDTO uninstallPackage(@RequestBody PackageRequestDTO packageRequestDTO);
 }

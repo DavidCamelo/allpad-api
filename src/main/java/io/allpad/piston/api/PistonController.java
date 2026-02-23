@@ -2,6 +2,7 @@ package io.allpad.piston.api;
 
 import io.allpad.piston.dto.ExecuteDTO;
 import io.allpad.piston.dto.PackageDTO;
+import io.allpad.piston.dto.PackageRequestDTO;
 import io.allpad.piston.dto.RuntimeDTO;
 import io.allpad.piston.service.PistonService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -45,13 +46,13 @@ public class PistonController {
 
     @Operation(summary = "Install package", description = "Install new runtime package")
     @PostMapping("packages")
-    public ResponseEntity<PackageDTO> installPackage(@RequestBody PackageDTO packageDTO) {
-        return ResponseEntity.ok(pistonService.installPackage(packageDTO));
+    public ResponseEntity<PackageDTO> installPackage(@RequestBody PackageRequestDTO packageRequestDTO) {
+        return ResponseEntity.ok(pistonService.installPackage(packageRequestDTO));
     }
 
     @Operation(summary = "Uninstall package", description = "Uninstall runtime package")
     @DeleteMapping("packages")
-    public ResponseEntity<PackageDTO> uninstallPackage(@RequestBody PackageDTO packageDTO) {
-        return ResponseEntity.ok(pistonService.uninstallPackage(packageDTO));
+    public ResponseEntity<PackageDTO> uninstallPackage(@RequestBody PackageRequestDTO packageRequestDTO) {
+        return ResponseEntity.ok(pistonService.uninstallPackage(packageRequestDTO));
     }
 }
