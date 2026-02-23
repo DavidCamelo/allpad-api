@@ -85,7 +85,7 @@ public class StripeSubscriptionServiceImpl implements StripeSubscriptionService 
                     .status(stripeSubscription.getStatus())
                     .build();
         } catch (StripeException e) {
-            throw new StripeSubscriptionException(String.format("Failed to create subscription: %s", e.getMessage()));
+            throw new StripeSubscriptionException(String.format("Failed to create subscription: %s", e.getMessage()), e);
         }
     }
 
@@ -137,7 +137,7 @@ public class StripeSubscriptionServiceImpl implements StripeSubscriptionService 
             stripeSubscription.setStatus(updatedSubscription.getStatus());
             stripeSubscriptionRepository.save(stripeSubscription);
         } catch (StripeException e) {
-            throw new StripeSubscriptionException(String.format("Failed to cancel subscription: %s", e.getMessage()));
+            throw new StripeSubscriptionException(String.format("Failed to cancel subscription: %s", e.getMessage()), e);
         }
     }
 
@@ -163,7 +163,7 @@ public class StripeSubscriptionServiceImpl implements StripeSubscriptionService 
                     log.info("Unhandled event type: {}", event.getType());
             }
         } catch (Exception e) {
-            throw new StripeSubscriptionException(String.format("Webhook verification failed: %s", e.getMessage()));
+            throw new StripeSubscriptionException(String.format("Webhook verification failed: %s", e.getMessage()), e);
         }
     }
 

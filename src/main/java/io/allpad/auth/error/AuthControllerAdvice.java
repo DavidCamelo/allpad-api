@@ -44,6 +44,11 @@ public class AuthControllerAdvice {
         return buildError(ex, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(value = { RoleAssignedException.class })
+    public ResponseEntity<ErrorDTO> handleRoleAssignedException(RoleAssignedException ex) {
+        return buildError(ex, HttpStatus.CONFLICT);
+    }
+
     @ExceptionHandler(value = { TokenExpiredException.class })
     public ResponseEntity<ErrorDTO> handleTokenExpiredException(TokenExpiredException ex) {
         return buildError(ex, HttpStatus.FORBIDDEN);

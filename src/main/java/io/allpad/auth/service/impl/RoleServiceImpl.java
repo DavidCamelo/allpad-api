@@ -2,16 +2,17 @@ package io.allpad.auth.service.impl;
 
 import io.allpad.auth.dto.RoleDTO;
 import io.allpad.auth.entity.Role;
+import io.allpad.auth.error.RoleAssignedException;
 import io.allpad.auth.error.RoleExistsException;
 import io.allpad.auth.error.RoleNotFoundException;
 import io.allpad.auth.mapper.RoleMapper;
 import io.allpad.auth.repository.RoleRepository;
 import io.allpad.auth.service.RoleService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -39,17 +40,16 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public void delete(UUID id) {
-        roleRepository.delete(findById(id));
+    public void delete(String name) {
+        try {
+            roleRepository.delete(findByName(name));
+        } catch (DataIntegrityViolationException ex) {
+            throw new RoleAssignedException(String.format("Role with name %s assigned to one or more users", name), ex);
+        }
     }
 
     private RoleDTO upsert(RoleDTO roleDTO, Role role) {
         roleMapper.map(roleDTO, role);
         return roleMapper.map(roleRepository.save(role));
-    }
-
-    private Role findById(UUID id) {
-        return roleRepository.findById(id)
-                .orElseThrow(() -> new RoleNotFoundException(String.format("Role with id %s not found", id)));
     }
 }
