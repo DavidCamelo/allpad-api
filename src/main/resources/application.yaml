@@ -11,8 +11,8 @@ spring:
     password: admin
   jpa:
     hibernate:
+      database-platform: org.hibernate.dialect.MariaDBDialect
       ddl-auto: update
-#      ddl-auto: create-drop
     properties:
       hibernate:
         batch_versioned_data: true
