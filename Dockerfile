@@ -10,6 +10,7 @@ WORKDIR /home
 COPY --from=build /home/app/target/*.jar /home/my-app.jar
 RUN java -Djarmode=tools -jar my-app.jar extract
 RUN rm my-app.jar
-RUN java -XX:ArchiveClassesAtExit=my-spring-cache.jsa -Dspring.profiles.active=train -Dspring.context.exit=onRefresh -jar /home/my-app/my-app.jar
+RUN java -XX:AOTMode=record -XX:AOTConfiguration=my-spring-cache.aotconf -Dspring.profiles.active=train -Dspring.context.exit=onRefresh -jar /home/my-app/my-app.jar
+RUN java -XX:AOTMode=create -XX:AOTConfiguration=my-spring-cache.aotconf -XX:AOTCache=my-spring-cache.aot -Dspring.profiles.active=train -Dspring.context.exit=onRefresh -jar /home/my-app/my-app.jar
 ENV JAVA_OPTS=""
-ENTRYPOINT [ "sh", "-c", "java $JAVA_OPTS -XX:SharedArchiveFile=my-spring-cache.jsa -jar /home/my-app/my-app.jar" ]
+ENTRYPOINT [ "sh", "-c", "java $JAVA_OPTS -XX:AOTCache=my-spring-cache.aot -jar /home/my-app/my-app.jar" ]
