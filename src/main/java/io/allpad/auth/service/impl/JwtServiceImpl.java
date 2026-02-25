@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.Collections;
-
 import java.util.List;
 
 @Service
@@ -44,7 +43,7 @@ public class JwtServiceImpl implements JwtService {
                 .getSubject();
     }
 
-    private String generateToken(String username, List<String> roles, long expiration) {
+    private String generateToken(String username, List<String> roles, Long expiration) {
         return JWT.create()
                 .withSubject(username)
                 .withClaim("roles", roles)

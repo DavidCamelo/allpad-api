@@ -4,7 +4,7 @@ import io.allpad.auth.dto.UserDTO;
 import io.allpad.auth.entity.RefreshToken;
 
 public interface RefreshTokenService {
-    RefreshToken createRefreshToken(String username);
+    RefreshToken createRefreshToken(String username, Long expiration);
 
     UserDTO verifyExpiration(String token);
 

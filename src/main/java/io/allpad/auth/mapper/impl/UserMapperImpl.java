@@ -24,6 +24,7 @@ public class UserMapperImpl implements UserMapper {
                 .password(password)
                 .encryptionKey(user.getEncryptionKey())
                 .roles(user.getRoles().stream().map(Role::getName).toList())
+                .refreshTokenExpiration(user.getRefreshTokenExpiration())
                 .build();
     }
 

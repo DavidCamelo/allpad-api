@@ -74,24 +74,22 @@ public class AuthController {
     private HttpHeaders createCookieHeaders(AuthDTO authDTO) {
         var headers = new HttpHeaders();
         if (authDTO.accessToken() != null) {
-            var maxAge = (authDTO.accessTokenExpiration() - System.currentTimeMillis()) / 1000;
+            var maxAge = ((authDTO.accessTokenExpiration() - System.currentTimeMillis()) / 1000) + 60;
             var accessCookie = ResponseCookie
                     .from("accessToken", authDTO.accessToken())
                     .httpOnly(true)
                     .path("/")
-                    .maxAge(maxAge > 0 ? maxAge : 3600)
+                    .maxAge(maxAge)
                     .build();
             headers.add(HttpHeaders.SET_COOKIE, accessCookie.toString());
         }
         if (authDTO.refreshToken() != null) {
-            long maxAge = (authDTO.refreshTokenExpiration() != null ? authDTO.refreshTokenExpiration()
-                    : (System.currentTimeMillis() + 86400000L * 7)) - System.currentTimeMillis();
-            maxAge = maxAge / 1000;
+            var maxAge = ((authDTO.refreshTokenExpiration() - System.currentTimeMillis()) / 1000) + 60;
             var refreshCookie = ResponseCookie
                     .from("refreshToken", authDTO.refreshToken())
                     .httpOnly(true)
                     .path("/")
-                    .maxAge(maxAge > 0 ? maxAge : 86400 * 7)
+                    .maxAge(maxAge)
                     .build();
             headers.add(HttpHeaders.SET_COOKIE, refreshCookie.toString());
         }

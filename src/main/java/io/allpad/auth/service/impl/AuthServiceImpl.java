@@ -40,12 +40,13 @@ public class AuthServiceImpl implements AuthService {
         if (authentication.isAuthenticated()) {
             var user = (CustomUserDetails) authentication.getPrincipal();
             assert user != null;
+            var refreshTokenExpiration = Instant.now().plusMillis(jwtProperties.refreshTokenExpiration()).toEpochMilli();
             return AuthDTO.builder()
                     .user(user.getUserDTO())
                     .accessTokenExpiration(Instant.now().plusMillis(jwtProperties.accessTokenExpiration()).toEpochMilli())
-                    .refreshTokenExpiration(Instant.now().plusMillis(jwtProperties.refreshTokenExpiration()).toEpochMilli())
+                    .refreshTokenExpiration(refreshTokenExpiration)
                     .accessToken(jwtService.generateAccessToken(userDTO.username(), userDTO.roles()))
-                    .refreshToken(refreshTokenService.createRefreshToken(userDTO.username()).getToken())
+                    .refreshToken(refreshTokenService.createRefreshToken(userDTO.username(), refreshTokenExpiration).getToken())
                     .build();
         }
         throw new AuthException("Authentication failed");
@@ -62,6 +63,7 @@ public class AuthServiceImpl implements AuthService {
         return AuthDTO.builder()
                 .user(userDTO)
                 .accessTokenExpiration(Instant.now().plusMillis(jwtProperties.accessTokenExpiration()).toEpochMilli())
+                .refreshTokenExpiration(userDTO.refreshTokenExpiration())
                 .accessToken(jwtService.generateAccessToken(userDTO.username(), userDTO.roles()))
                 .build();
     }

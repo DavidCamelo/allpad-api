@@ -1,5 +1,6 @@
 package io.allpad.auth.service.impl;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import io.allpad.auth.dto.UserDTO;
 import io.allpad.auth.entity.RefreshToken;
 import io.allpad.auth.error.AuthException;
@@ -18,22 +19,29 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     private final JwtService jwtService;
 
     @Override
-    public RefreshToken createRefreshToken(String username) {
+    public RefreshToken createRefreshToken(String username, Long expiration) {
         var refreshToken = new RefreshToken();
         refreshToken.setUser(userService.getUserByUsername(username));
+        refreshToken.setExpiration(expiration);
         refreshToken.setToken(jwtService.generateRefreshToken(username));
         return refreshTokenRepository.save(refreshToken);
     }
 
     @Override
     public UserDTO verifyExpiration(String token) {
-        var username = jwtService.validateTokenAndGetUsername(token);
-        var user = userService.getUserByUsername(username);
-        var refreshToken = refreshTokenRepository.findByTokenAndUser(token, user).orElseThrow(() -> {
+        try {
+            var username = jwtService.validateTokenAndGetUsername(token);
+            var user = userService.getUserByUsername(username);
+            var refreshToken = refreshTokenRepository.findByTokenAndUser(token, user).orElseThrow(() -> {
+                deleteRefreshToken(token);
+                return new AuthException("Invalid refresh token");
+            });
+            user.setRefreshTokenExpiration(refreshToken.getExpiration());
+            return userService.map(refreshToken.getUser());
+        } catch (JWTVerificationException ex) {
             deleteRefreshToken(token);
-            return new AuthException("Invalid refresh token");
-        });
-        return userService.map(refreshToken.getUser());
+            throw new AuthException(String.format("Invalid JWT token: %s", ex.getMessage()));
+        }
     }
 
     @Override

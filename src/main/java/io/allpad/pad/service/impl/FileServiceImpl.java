@@ -7,6 +7,7 @@ import io.allpad.pad.error.AuthException;
 import io.allpad.pad.error.FileNotFoundException;
 import io.allpad.pad.mapper.FileMapper;
 import io.allpad.pad.repository.FileRepository;
+import io.allpad.pad.repository.HistoryRepository;
 import io.allpad.pad.service.FileService;
 import io.allpad.pad.service.PadService;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import java.util.UUID;
 public class FileServiceImpl implements FileService {
     private final FileMapper fileMapper;
     private final FileRepository fileRepository;
+    private final HistoryRepository historyRepository;
     private final PadService padService;
     private final ContextUtils contextUtils;
 
@@ -72,7 +74,9 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public void delete(UUID id) {
-        fileRepository.delete(findById(id));
+        var file = findById(id);
+        historyRepository.findAllByFile(file).forEach(tinyHistoryDTO -> historyRepository.deleteById(tinyHistoryDTO.id()));
+        fileRepository.delete(file);
     }
 
     private FileDTO upsert(FileDTO fileDTO, File file) {
