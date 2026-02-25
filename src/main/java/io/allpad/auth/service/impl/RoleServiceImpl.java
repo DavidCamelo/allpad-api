@@ -9,11 +9,13 @@ import io.allpad.auth.mapper.RoleMapper;
 import io.allpad.auth.repository.RoleRepository;
 import io.allpad.auth.service.RoleService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RoleServiceImpl implements RoleService {
@@ -44,7 +46,8 @@ public class RoleServiceImpl implements RoleService {
         try {
             roleRepository.delete(findByName(name));
         } catch (DataIntegrityViolationException ex) {
-            throw new RoleAssignedException(String.format("Role with name %s assigned to one or more users", name), ex);
+            log.error(ex.getMessage());
+            throw new RoleAssignedException(String.format("Role with name %s assigned to one or more users", name));
         }
     }
 

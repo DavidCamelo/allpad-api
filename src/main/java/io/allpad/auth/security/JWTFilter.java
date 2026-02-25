@@ -34,10 +34,18 @@ public class JWTFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        var jwtToken = request.getHeader("Authorization");
+        var cookies = request.getCookies();
+        var jwtToken = "";
+        if (cookies != null) {
+            for (var cookie : cookies) {
+                if ("accessToken".equals(cookie.getName())) {
+                    jwtToken = cookie.getValue();
+                    break;
+                }
+            }
+        }
         var username = "";
-        if (jwtToken != null && jwtToken.startsWith("Bearer ")) {
-            jwtToken = jwtToken.substring(7);
+        if (jwtToken != null && !jwtToken.isEmpty()) {
             try {
                 username = jwtService.validateTokenAndGetUsername(jwtToken);
             } catch (JWTVerificationException e) {

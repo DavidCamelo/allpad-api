@@ -31,8 +31,10 @@ public class FileMapperImpl implements FileMapper {
         if (fileDTO == null || file == null) {
             return;
         }
+        if (fileDTO.isOpen()) {
+            file.setContent(fileDTO.content());
+        }
         file.setName(fileDTO.name());
-        file.setContent(fileDTO.content());
         file.setLanguage(fileDTO.language());
         file.setPane(fileDTO.pane());
         file.setIsOpen(fileDTO.isOpen());
