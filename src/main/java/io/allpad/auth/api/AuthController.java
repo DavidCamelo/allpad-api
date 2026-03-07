@@ -40,7 +40,11 @@ public class AuthController {
 
     @Operation(summary = "Logout", description = "User logout")
     @PostMapping("logout")
-    public ResponseEntity<Void> logout(@CookieValue(name = "refreshToken", required = false) String refreshToken) {
+    public ResponseEntity<Void> logout(@CookieValue(required = false) String refreshToken,
+            @RequestBody(required = false) TokenDTO tokenDTO) {
+        if ((refreshToken == null || refreshToken.isEmpty()) && tokenDTO != null) {
+            refreshToken = tokenDTO.token();
+        }
         if (refreshToken != null && !refreshToken.isEmpty()) {
             authService.logout(new TokenDTO(refreshToken, null));
         }
@@ -49,7 +53,11 @@ public class AuthController {
 
     @Operation(summary = "Refresh", description = "Refresh token")
     @PostMapping("refresh")
-    public ResponseEntity<AuthDTO> refresh(@CookieValue(name = "refreshToken", required = false) String refreshToken) {
+    public ResponseEntity<AuthDTO> refresh(@CookieValue(required = false) String refreshToken,
+            @RequestBody(required = false) TokenDTO tokenDTO) {
+        if ((refreshToken == null || refreshToken.isEmpty()) && tokenDTO != null) {
+            refreshToken = tokenDTO.token();
+        }
         if (refreshToken == null || refreshToken.isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).headers(clearCookieHeaders()).build();
         }

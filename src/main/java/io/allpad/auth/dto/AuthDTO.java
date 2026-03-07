@@ -1,6 +1,5 @@
 package io.allpad.auth.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 
@@ -10,6 +9,6 @@ public record AuthDTO(
         UserDTO user,
         Long accessTokenExpiration,
         Long refreshTokenExpiration,
-        @JsonIgnore String accessToken,
-        @JsonIgnore String refreshToken) {
+        String accessToken,
+        String refreshToken) {
 }

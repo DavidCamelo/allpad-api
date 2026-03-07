@@ -33,7 +33,8 @@ public class JWTFilter extends OncePerRequestFilter {
     private final JsonMapper jsonMapper = new JsonMapper();
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
+    protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain)
             throws ServletException, IOException {
         if (request.getServletPath().contains("auth")) {
             filterChain.doFilter(request, response);
@@ -47,6 +48,12 @@ public class JWTFilter extends OncePerRequestFilter {
                     jwtToken = cookie.getValue();
                     break;
                 }
+            }
+        }
+        if (jwtToken == null || jwtToken.isEmpty()) {
+            jwtToken = request.getHeader("Authorization");
+            if (jwtToken != null && jwtToken.startsWith("Bearer ")) {
+                jwtToken = jwtToken.substring(7);
             }
         }
         var username = "";

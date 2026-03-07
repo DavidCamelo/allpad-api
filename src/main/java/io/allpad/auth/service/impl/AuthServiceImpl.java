@@ -40,13 +40,16 @@ public class AuthServiceImpl implements AuthService {
         if (authentication.isAuthenticated()) {
             var user = (CustomUserDetails) authentication.getPrincipal();
             assert user != null;
-            var refreshTokenExpiration = Instant.now().plusMillis(jwtProperties.refreshTokenExpiration()).toEpochMilli();
+            var refreshTokenExpiration = Instant.now().plusMillis(jwtProperties.refreshTokenExpiration())
+                    .toEpochMilli();
             return AuthDTO.builder()
                     .user(user.getUserDTO())
-                    .accessTokenExpiration(Instant.now().plusMillis(jwtProperties.accessTokenExpiration()).toEpochMilli())
+                    .accessTokenExpiration(
+                            Instant.now().plusMillis(jwtProperties.accessTokenExpiration()).toEpochMilli())
                     .refreshTokenExpiration(refreshTokenExpiration)
                     .accessToken(jwtService.generateAccessToken(userDTO.username(), userDTO.roles()))
-                    .refreshToken(refreshTokenService.createRefreshToken(userDTO.username(), refreshTokenExpiration).getToken())
+                    .refreshToken(refreshTokenService.createRefreshToken(userDTO.username(), refreshTokenExpiration)
+                            .getToken())
                     .build();
         }
         throw new AuthException("Authentication failed");
@@ -72,7 +75,7 @@ public class AuthServiceImpl implements AuthService {
     public void recoverPassword(UserDTO userDTO) {
         var user = userService.getUserByUsername(userDTO.email());
         var token = jwtService.generateResetPasswordToken(user.getEmail());
-        log.info("https://allpad.io/update-password/{}", token);
+        log.info("https://allpad.io/?modal=update-password/{}", token);
         // TODO send email with token
     }
 
