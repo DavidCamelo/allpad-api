@@ -1,4 +1,4 @@
-package io.allpad.auth.utils;
+package io.allpad.utils;
 
 import lombok.Builder;
 

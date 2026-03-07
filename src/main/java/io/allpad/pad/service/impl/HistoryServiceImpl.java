@@ -1,8 +1,5 @@
 package io.allpad.pad.service.impl;
 
-import io.allpad.auth.utils.ContextUtils;
-import io.allpad.auth.utils.EncryptionUtils;
-import io.allpad.auth.utils.LZStringUtils;
 import io.allpad.pad.dto.HistoryDTO;
 import io.allpad.pad.dto.TinyHistoryDTO;
 import io.allpad.pad.entity.File;
@@ -15,6 +12,9 @@ import io.allpad.pad.service.FileService;
 import io.allpad.pad.service.HistoryService;
 import io.allpad.pad.service.PadService;
 import io.allpad.stripe.service.PlanService;
+import io.allpad.utils.ContextUtils;
+import io.allpad.utils.EncryptionUtils;
+import io.allpad.utils.LZStringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -71,7 +71,7 @@ public class HistoryServiceImpl implements HistoryService {
             var histories = historyRepository.findAllByFile(file);
             var planDTO = planService.getCurrentPlan();
             var limit = planDTO.planLimits().historiesPerFile();
-            boolean[] isFirst = {true};
+            boolean[] isFirst = { true };
             return histories.stream()
                     .sorted(Comparator.comparing(TinyHistoryDTO::createdAt).reversed())
                     .limit(limit)
@@ -91,7 +91,7 @@ public class HistoryServiceImpl implements HistoryService {
                                 .fileId(tinyHistoryDTO.fileId())
                                 .createdAt(tinyHistoryDTO.createdAt().toEpochMilli())
                                 .build();
-            }).toList();
+                    }).toList();
         }
         throw new AuthException("User not authorized to access this history");
     }

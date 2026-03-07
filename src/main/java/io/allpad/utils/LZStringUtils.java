@@ -1,4 +1,4 @@
-package io.allpad.auth.utils;
+package io.allpad.utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -707,4 +707,3 @@ public class LZStringUtils {
     }
 
 }
-

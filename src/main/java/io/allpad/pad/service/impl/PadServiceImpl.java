@@ -1,6 +1,5 @@
 package io.allpad.pad.service.impl;
 
-import io.allpad.auth.utils.ContextUtils;
 import io.allpad.pad.dto.PadDTO;
 import io.allpad.pad.entity.Pad;
 import io.allpad.pad.error.AuthException;
@@ -10,6 +9,7 @@ import io.allpad.pad.repository.FileRepository;
 import io.allpad.pad.repository.HistoryRepository;
 import io.allpad.pad.repository.PadRepository;
 import io.allpad.pad.service.PadService;
+import io.allpad.utils.ContextUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -65,7 +65,8 @@ public class PadServiceImpl implements PadService {
             var fileO = fileRepository.findById(tinyFileDTO.id());
             if (fileO.isPresent()) {
                 var file = fileO.get();
-                historyRepository.findAllByFile(file).forEach(tinyHistoryDTO -> historyRepository.deleteById(tinyHistoryDTO.id()));
+                historyRepository.findAllByFile(file)
+                        .forEach(tinyHistoryDTO -> historyRepository.deleteById(tinyHistoryDTO.id()));
                 fileRepository.delete(file);
                 fileRepository.deleteById(file.getId());
             }

@@ -8,7 +8,7 @@ import io.allpad.auth.mapper.UserMapper;
 import io.allpad.auth.repository.UserRepository;
 import io.allpad.auth.service.RoleService;
 import io.allpad.auth.service.UserService;
-import io.allpad.auth.utils.EncryptionUtils;
+import io.allpad.utils.EncryptionUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

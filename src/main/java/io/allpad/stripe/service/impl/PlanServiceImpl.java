@@ -6,14 +6,14 @@ import com.stripe.model.Price;
 import com.stripe.model.Product;
 import com.stripe.model.Subscription;
 import com.stripe.param.ProductListParams;
-import io.allpad.auth.utils.ContextUtils;
-import io.allpad.piston.config.PistonProperties;
+
 import io.allpad.stripe.config.StripeProperties;
 import io.allpad.stripe.dto.PlanDTO;
 import io.allpad.stripe.dto.PlanLimitsDTO;
 import io.allpad.stripe.dto.SubscriptionStatusDTO;
 import io.allpad.stripe.repository.StripeSubscriptionRepository;
 import io.allpad.stripe.service.PlanService;
+import io.allpad.utils.ContextUtils;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +28,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class PlanServiceImpl implements PlanService {
-    private final PistonProperties pistonProperties;
     private final StripeProperties stripeProperties;
     private final StripeSubscriptionRepository stripeSubscriptionRepository;
     private final ContextUtils contextUtils;

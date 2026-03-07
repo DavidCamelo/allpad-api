@@ -1,6 +1,5 @@
 package io.allpad.pad.service.impl;
 
-import io.allpad.auth.utils.ContextUtils;
 import io.allpad.pad.dto.FileDTO;
 import io.allpad.pad.entity.File;
 import io.allpad.pad.error.AuthException;
@@ -10,6 +9,7 @@ import io.allpad.pad.repository.FileRepository;
 import io.allpad.pad.repository.HistoryRepository;
 import io.allpad.pad.service.FileService;
 import io.allpad.pad.service.PadService;
+import io.allpad.utils.ContextUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -75,7 +75,8 @@ public class FileServiceImpl implements FileService {
     @Override
     public void delete(UUID id) {
         var file = findById(id);
-        historyRepository.findAllByFile(file).forEach(tinyHistoryDTO -> historyRepository.deleteById(tinyHistoryDTO.id()));
+        historyRepository.findAllByFile(file)
+                .forEach(tinyHistoryDTO -> historyRepository.deleteById(tinyHistoryDTO.id()));
         fileRepository.delete(file);
     }
 
