@@ -1,4 +1,4 @@
-package io.allpad.stripe.config;
+package io.allpad.payment.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

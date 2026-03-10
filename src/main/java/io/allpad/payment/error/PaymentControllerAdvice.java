@@ -1,8 +1,8 @@
-package io.allpad.stripe.error;
+package io.allpad.payment.error;
 
-import io.allpad.stripe.api.PlanController;
-import io.allpad.stripe.api.StripeSubscriptionController;
-import io.allpad.stripe.dto.ErrorDTO;
+import io.allpad.payment.api.PaymentController;
+import io.allpad.payment.api.PlanController;
+import io.allpad.payment.dto.ErrorDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.time.Instant;
 
 @Slf4j
-@RestControllerAdvice(assignableTypes = { StripeSubscriptionController.class, PlanController.class})
-public class StripeSubscriptionControllerAdvice {
+@RestControllerAdvice(assignableTypes = { PaymentController.class, PlanController.class})
+public class PaymentControllerAdvice {
 
-    @ExceptionHandler(value = { StripeSubscriptionException.class })
-    public ResponseEntity<ErrorDTO> handleStripeSubscriptionException(StripeSubscriptionException ex) {
+    @ExceptionHandler(value = { SubscriptionException.class })
+    public ResponseEntity<ErrorDTO> handleSubscriptionException(SubscriptionException ex) {
         return buildError(ex, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

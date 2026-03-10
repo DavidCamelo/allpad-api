@@ -4,6 +4,15 @@ springdoc:
 spring:
   application:
     name: All Pad
+  cache:
+    type: redis
+  data:
+    redis:
+      host: redis
+      port: 6379
+  threads:
+    virtual:
+      enabled: true
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
     url: jdbc:mariadb://mariadb:3306/allpad?createDatabaseIfNotExist=true
@@ -54,6 +63,10 @@ stripe:
   secret-key: REPLACE_FOR_THE_REAL_STRIPE_API_KEY
   public-key: REPLACE_FOR_THE_REAL_STRIPE_PUBLIC_KEY
   webhook-secret: REPLACE_FOR_THE_REAL_STRIPE_WEBHOOK_SECRET
+mercadopago:
+  access-token: REPLACE_FOR_THE_REAL_MERCADOPAGO_ACCESS_TOKEN
+  public-key: REPLACE_FOR_THE_REAL_MERCADOPAGO_PUBLIC_KEY
+  webhook-secret: REPLACE_FOR_THE_REAL_MERCADOPAGO_WEBHOOK_SECRET
 piston:
   url: REPLACE_FOR_THE_REAL_URL
   user: REPLACE_FOR_THE_REAL_USER

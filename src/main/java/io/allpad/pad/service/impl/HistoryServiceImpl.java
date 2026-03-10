@@ -11,7 +11,7 @@ import io.allpad.pad.repository.HistoryRepository;
 import io.allpad.pad.service.FileService;
 import io.allpad.pad.service.HistoryService;
 import io.allpad.pad.service.PadService;
-import io.allpad.stripe.service.PlanService;
+import io.allpad.payment.service.PlanService;
 import io.allpad.utils.ContextUtils;
 import io.allpad.utils.EncryptionUtils;
 import io.allpad.utils.LZStringUtils;

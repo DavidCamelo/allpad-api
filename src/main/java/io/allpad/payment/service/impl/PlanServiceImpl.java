@@ -1,4 +1,4 @@
-package io.allpad.stripe.service.impl;
+package io.allpad.payment.service.impl;
 
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
@@ -7,12 +7,12 @@ import com.stripe.model.Product;
 import com.stripe.model.Subscription;
 import com.stripe.param.ProductListParams;
 
-import io.allpad.stripe.config.StripeProperties;
-import io.allpad.stripe.dto.PlanDTO;
-import io.allpad.stripe.dto.PlanLimitsDTO;
-import io.allpad.stripe.dto.SubscriptionStatusDTO;
-import io.allpad.stripe.repository.StripeSubscriptionRepository;
-import io.allpad.stripe.service.PlanService;
+import io.allpad.payment.config.StripeProperties;
+import io.allpad.payment.dto.PlanDTO;
+import io.allpad.payment.dto.PlanLimitsDTO;
+import io.allpad.payment.dto.SubscriptionStatusDTO;
+import io.allpad.payment.repository.SubscriptionRepository;
+import io.allpad.payment.service.PlanService;
 import io.allpad.utils.ContextUtils;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PlanServiceImpl implements PlanService {
     private final StripeProperties stripeProperties;
-    private final StripeSubscriptionRepository stripeSubscriptionRepository;
+    private final SubscriptionRepository subscriptionRepository;
     private final ContextUtils contextUtils;
 
     @PostConstruct
@@ -40,10 +40,10 @@ public class PlanServiceImpl implements PlanService {
     @Override
     public PlanDTO getCurrentPlan() {
         try {
-            var existingSubscription = stripeSubscriptionRepository.findByUser(contextUtils.getUser());
+            var existingSubscription = subscriptionRepository.findByUser(contextUtils.getUser());
             if (existingSubscription.isPresent()) {
                 var stripeSubscription = existingSubscription.get();
-                var subscription = Subscription.retrieve(stripeSubscription.getStripeSubscriptionId());
+                var subscription = Subscription.retrieve(stripeSubscription.getSubscriptionId());
                 var currentPeriodEnd = subscription.getItems().getData().getFirst().getCurrentPeriodEnd();
                 if (Instant.now().isBefore(Instant.ofEpochSecond(currentPeriodEnd))) {
                     var product = Product.retrieve(stripeSubscription.getPlanId());
@@ -51,7 +51,7 @@ public class PlanServiceImpl implements PlanService {
                             .status(subscription.getStatus())
                             .currentPeriodEnd(currentPeriodEnd)
                             .build();
-                    return getPlan(product, stripeSubscription.getStripeSubscriptionId(), subscriptionStatusDTO);
+                    return getPlan(product, stripeSubscription.getSubscriptionId(), subscriptionStatusDTO);
                 }
             }
         } catch (StripeException e) {

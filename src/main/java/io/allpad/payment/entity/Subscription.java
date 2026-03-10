@@ -1,4 +1,4 @@
-package io.allpad.stripe.entity;
+package io.allpad.payment.entity;
 
 import io.allpad.auth.entity.User;
 import jakarta.persistence.*;
@@ -15,18 +15,18 @@ import java.util.UUID;
 @AllArgsConstructor
 @Entity
 @Table(name = "subscriptions")
-public class StripeSubscription {
+public class Subscription {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-    private String stripeCustomerId; // Customer ID in Stripe (cus_...)
-    private String stripeSubscriptionId; // Subscription ID in Stripe (sub_...)
+    private String customerId; // Customer ID in Stripe (cus_...)
+    private String subscriptionId; // Subscription ID in Stripe (sub_...)
     private String planId; // The product ID
     private String priceId; //price ID
     private String status; // active, incomplete, canceled, etc.
-    private String invoiceStatus;
+    private String invoiceStatus; // paid, unpaid, etc.
     private Long currentPeriodEnd; // Timestamp for when the current period ends
 }

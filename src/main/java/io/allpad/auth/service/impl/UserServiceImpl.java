@@ -10,6 +10,9 @@ import io.allpad.auth.service.RoleService;
 import io.allpad.auth.service.UserService;
 import io.allpad.utils.EncryptionUtils;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,12 +23,14 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+    private static final String USERS_CACHE = "users";
     private final PasswordEncoder passwordEncoder;
     private final RoleService roleService;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
     @Override
+    @CachePut(value = USERS_CACHE, key = "#userDTO.username()")
     public UserDTO create(UserDTO userDTO) {
         if (userRepository.findByEmail(userDTO.email()).isPresent()) {
             throw new UserExistsException(String.format("User with email %s already exists", userDTO.email()));
@@ -44,6 +49,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @CachePut(value = USERS_CACHE, key = "#username")
     public void updatePassword(String username, String password) {
         var user = getUserByUsername(username);
         user.setPassword(passwordEncoder.encode(password));
@@ -57,6 +63,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Cacheable(value = USERS_CACHE, key = "#username")
     public User getUserByUsername(String username) {
         return findUserByUsername(username).orElseThrow(
                 () -> new UserNotFoundException(String.format("User with username %s not found", username)));
@@ -68,6 +75,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @CachePut(value = USERS_CACHE, key = "#username")
     public UserDTO assignRoleToUser(String username, String roleName) {
         var user = getUserByUsername(username);
         var role = roleService.findByName(roleName);
@@ -76,6 +84,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @CachePut(value = USERS_CACHE, key = "#username")
     public UserDTO removeRoleFromUser(String username, String roleName) {
         var user = getUserByUsername(username);
         var role = roleService.findByName(roleName);

@@ -1,4 +1,4 @@
-package io.allpad.stripe.dto;
+package io.allpad.payment.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;

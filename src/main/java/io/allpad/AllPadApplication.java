@@ -3,12 +3,14 @@ package io.allpad;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
+import org.springframework.cache.annotation.EnableCaching;
 
+@EnableCaching
 @SpringBootApplication
 @ConfigurationPropertiesScan
 public class AllPadApplication {
 
-	static void main(String[] args) {
-		SpringApplication.run(AllPadApplication.class, args);
-	}
+    static void main(String[] args) {
+        SpringApplication.run(AllPadApplication.class, args);
+    }
 }

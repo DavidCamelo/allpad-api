@@ -1,11 +1,11 @@
-package io.allpad.stripe.dto;
+package io.allpad.payment.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record StripeSubscriptionDTO(
+public record SubscriptionDTO(
         String planId,
         String priceId,
         String subscriptionId,

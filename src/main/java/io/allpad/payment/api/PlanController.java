@@ -1,7 +1,7 @@
-package io.allpad.stripe.api;
+package io.allpad.payment.api;
 
-import io.allpad.stripe.dto.PlanDTO;
-import io.allpad.stripe.service.PlanService;
+import io.allpad.payment.dto.PlanDTO;
+import io.allpad.payment.service.PlanService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
