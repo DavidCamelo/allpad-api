@@ -22,7 +22,7 @@ spec:
               protocol: TCP
           env:
             - name: JAVA_OPTS
-              value: -Xms64m -Xmx512m -XX:+ExitOnOutOfMemoryError -XX:AOTCache=my-app.aot -XX:AOTMode=on -Dspring.main.lazy-initialization=true
+              value: -Xms64m -Xmx512m -XX:+ExitOnOutOfMemoryError
             - name: SPRING_DATASOURCE_PASSWORD
               valueFrom:
                 secretKeyRef:
