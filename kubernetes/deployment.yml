@@ -20,14 +20,9 @@ spec:
           ports:
             - containerPort: 8080
               protocol: TCP
-          resources:
-            limits:
-              memory: 512Mi
-            requests:
-              memory: 64Mi
           env:
             - name: JAVA_OPTS
-              value: -Xms64m -Xmx512m -XX:+ExitOnOutOfMemoryError
+              value: -Xms64m -Xmx512m -XX:+ExitOnOutOfMemoryError -XX:AOTCache=my-app.aot -XX:AOTMode=on -Dspring.main.lazy-initialization=true
             - name: SPRING_DATASOURCE_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -70,11 +65,3 @@ spec:
                   key: secret
             - name: SPRING_JPA_SHOW_SQL
               value: "false"
-          imagePullPolicy: Always
-      restartPolicy: Always
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxUnavailable: 1
-      maxSurge: 1
-  revisionHistoryLimit: 1
