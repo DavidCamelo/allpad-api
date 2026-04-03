@@ -18,7 +18,7 @@ import io.allpad.payment.dto.SubscriptionDTO;
 import io.allpad.payment.entity.Subscription;
 import io.allpad.payment.error.SubscriptionException;
 import io.allpad.payment.repository.SubscriptionRepository;
-import io.allpad.payment.service.PaymentService;
+import io.allpad.payment.service.SubscriptionService;
 import io.allpad.utils.ContextUtils;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,7 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class StripePaymentServiceImpl implements PaymentService {
+public class StripeSubscriptionServiceImpl implements SubscriptionService {
     private final StripeProperties stripeProperties;
     private final SubscriptionRepository subscriptionRepository;
     private final ContextUtils contextUtils;
@@ -73,7 +73,8 @@ public class StripePaymentServiceImpl implements PaymentService {
             subscription.setStatus(stripeSubscription.getStatus());
             subscription.setCurrentPeriodEnd(stripeSubscription.getItems().getData().getLast().getCurrentPeriodEnd());
             subscriptionRepository.save(subscription);
-            var paymentIntentId = stripeSubscription.getLatestInvoiceObject().getPayments().getData().getLast().getPayment()
+            var paymentIntentId = stripeSubscription.getLatestInvoiceObject().getPayments().getData().getLast()
+                    .getPayment()
                     .getPaymentIntent();
             var paymentIntent = PaymentIntent.retrieve(paymentIntentId);
             return SubscriptionDTO.builder()
@@ -110,7 +111,7 @@ public class StripePaymentServiceImpl implements PaymentService {
     }
 
     private com.stripe.model.Subscription downgradeUpgradeSubscription(com.stripe.model.Subscription subscription,
-                                                                       SubscriptionDTO subscriptionDTO) throws StripeException {
+            SubscriptionDTO subscriptionDTO) throws StripeException {
         var params = SubscriptionUpdateParams.builder()
                 .addItem(
                         SubscriptionUpdateParams.Item.builder()

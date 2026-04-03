@@ -43,12 +43,24 @@ public class PlanServiceImpl implements PlanService {
             var existingSubscription = subscriptionRepository.findByUser(contextUtils.getUser());
             if (existingSubscription.isPresent()) {
                 var stripeSubscription = existingSubscription.get();
-                var subscription = Subscription.retrieve(stripeSubscription.getSubscriptionId());
-                var currentPeriodEnd = subscription.getItems().getData().getFirst().getCurrentPeriodEnd();
-                if (Instant.now().isBefore(Instant.ofEpochSecond(currentPeriodEnd))) {
+                if (stripeSubscription.getSubscriptionId() != null && stripeSubscription.getSubscriptionId().startsWith("sub_")) {
+                    var subscription = Subscription.retrieve(stripeSubscription.getSubscriptionId());
+                    var currentPeriodEnd = subscription.getItems().getData().getFirst().getCurrentPeriodEnd();
+                    if (Instant.now().isBefore(Instant.ofEpochSecond(currentPeriodEnd))) {
+                        var product = Product.retrieve(stripeSubscription.getPlanId());
+                        var subscriptionStatusDTO = SubscriptionStatusDTO.builder()
+                                .status(subscription.getStatus())
+                                .currentPeriodEnd(currentPeriodEnd)
+                                .build();
+                        return getPlan(product, stripeSubscription.getSubscriptionId(), subscriptionStatusDTO);
+                    }
+                } else {
+                    // It's a Mercado Pago Subscription
                     var product = Product.retrieve(stripeSubscription.getPlanId());
+                    Long currentPeriodEnd = stripeSubscription.getCurrentPeriodEnd();
+                    if (currentPeriodEnd == null) currentPeriodEnd = Instant.now().plusSeconds(30 * 24 * 60 * 60).getEpochSecond(); // Default 30 days if not set
                     var subscriptionStatusDTO = SubscriptionStatusDTO.builder()
-                            .status(subscription.getStatus())
+                            .status(stripeSubscription.getStatus())
                             .currentPeriodEnd(currentPeriodEnd)
                             .build();
                     return getPlan(product, stripeSubscription.getSubscriptionId(), subscriptionStatusDTO);
@@ -65,6 +77,7 @@ public class PlanServiceImpl implements PlanService {
         List<PlanDTO> planList = new ArrayList<>();
         try {
             var productParams = ProductListParams.builder().build();
+
             var products = Product.list(productParams);
             planList.add(getFreePlan());
             planList.addAll(products.getData().stream()

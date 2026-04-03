@@ -64,9 +64,12 @@ stripe:
   public-key: REPLACE_FOR_THE_REAL_STRIPE_PUBLIC_KEY
   webhook-secret: REPLACE_FOR_THE_REAL_STRIPE_WEBHOOK_SECRET
 mercadopago:
-  access-token: REPLACE_FOR_THE_REAL_MERCADOPAGO_ACCESS_TOKEN
-  public-key: REPLACE_FOR_THE_REAL_MERCADOPAGO_PUBLIC_KEY
-  webhook-secret: REPLACE_FOR_THE_REAL_MERCADOPAGO_WEBHOOK_SECRET
+  access-token: REPLACE_FOR_THE_REAL_MP_ACCESS_TOKEN
+  public-key: REPLACE_FOR_THE_REAL_MP_PUBLIC_KEY
+  webhook-secret: REPLACE_FOR_THE_REAL_MP_WEBHOOK_SECRET
+  preapproval-plan-basic-id: 34ae40e6f4154851b9409ba1f92b2d1f
+  preapproval-plan-standard-id: be499d67cc7a4090917330fa3be77973
+  preapproval-plan-premium-id: 81ef56979c3a47c7a6b5aea5cc638591
 piston:
   url: REPLACE_FOR_THE_REAL_URL
   user: REPLACE_FOR_THE_REAL_USER

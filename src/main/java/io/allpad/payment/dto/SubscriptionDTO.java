@@ -8,7 +8,9 @@ import lombok.Builder;
 public record SubscriptionDTO(
         String planId,
         String priceId,
+        String planName,
         String subscriptionId,
         String clientSecret,
+        String provider,
         String status) {
 }

@@ -2,8 +2,7 @@ package io.allpad.payment.api;
 
 import lombok.RequiredArgsConstructor;
 import io.allpad.payment.dto.SubscriptionDTO;
-import io.allpad.payment.service.impl.MercadoPagoPaymentServiceImpl;
-import io.allpad.payment.service.impl.StripePaymentServiceImpl;
+import io.allpad.payment.service.PaymentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -20,25 +19,26 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "api/{version}/payments", version = "v1")
 @RequiredArgsConstructor
 public class PaymentController {
-    private final StripePaymentServiceImpl stripePaymentService;
-    private final MercadoPagoPaymentServiceImpl mercadoPagoPaymentService;
+    private final PaymentService paymentService;
 
     @Operation(summary = "Create subscription", description = "Create subscription")
     @PostMapping("subscription")
     public ResponseEntity<SubscriptionDTO> createSubscription(@RequestBody SubscriptionDTO subscriptionDTO) {
-        return ResponseEntity.ok(stripePaymentService.createSubscription(subscriptionDTO));
+        return ResponseEntity.ok(paymentService.createSubscription(subscriptionDTO));
     }
 
     @Operation(summary = "Cancel subscription", description = "Cancel subscription")
     @DeleteMapping("subscription")
     public ResponseEntity<Void> cancelSubscription() {
-        stripePaymentService.cancelSubscription();
+        paymentService.cancelSubscription();
         return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "Stripe Webhook", description = "Handle Stripe Webhook events")
     @PostMapping("webhook")
-    public void handleWebhook(@RequestBody String payload, @RequestHeader("Stripe-Signature") String sigHeader) {
-        stripePaymentService.handleWebhook(payload, sigHeader);
+    public void handleWebhook(@RequestBody String payload,
+            @RequestHeader(value = "Stripe-Signature", required = false) String stripeSignature,
+            @RequestHeader(value = "x-signature", required = false) String mercadoPagoSignature) {
+        paymentService.handleWebhook(payload, stripeSignature, mercadoPagoSignature);
     }
 }
