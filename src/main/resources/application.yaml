@@ -30,7 +30,7 @@ spring:
           batch_size: 2
         order_inserts: true
         order_updates: true
-    show_sql: true
+    show_sql: false
 management:
   tracing:
     sampling:
