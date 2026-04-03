@@ -4,7 +4,7 @@ COPY . .
 RUN chmod +x mvnw
 RUN ./mvnw clean compile spring-boot:process-aot package -DskipTests --no-transfer-progress
 RUN rm -rf /root/.m2/repository
-COPY target/*.jar /home/my-app.jar
+RUN cp target/*.jar /home/my-app.jar
 WORKDIR /home
 RUN rm -rf app
 RUN java -Djarmode=tools -jar my-app.jar extract
