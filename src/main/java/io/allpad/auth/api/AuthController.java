@@ -36,7 +36,7 @@ public class AuthController {
     @Operation(summary = "Login", description = "User login authentication")
     @PostMapping("login")
     public ResponseEntity<AuthDTO> login(@RequestBody UserDTO userDTO) {
-        log.info("User login: {}", userDTO.email());
+        log.info("User login: {}", userDTO.username());
         try {
             var authDTO = authService.login(userDTO);
             log.info("Auth {} logged in successfully", authDTO);
