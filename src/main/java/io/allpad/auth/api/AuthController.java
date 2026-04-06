@@ -7,6 +7,7 @@ import io.allpad.auth.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @Tag(name = "Auth API")
 @RestController
 @RequestMapping(value = "api/{version}/auth", version = "v1")
@@ -34,8 +36,15 @@ public class AuthController {
     @Operation(summary = "Login", description = "User login authentication")
     @PostMapping("login")
     public ResponseEntity<AuthDTO> login(@RequestBody UserDTO userDTO) {
-        var authDTO = authService.login(userDTO);
-        return ResponseEntity.ok().headers(createCookieHeaders(authDTO)).body(authDTO);
+        log.info("User login: {}", userDTO.email());
+        try {
+            var authDTO = authService.login(userDTO);
+            log.info("Auth {} logged in successfully", authDTO);
+            return ResponseEntity.ok().headers(createCookieHeaders(authDTO)).body(authDTO);
+        } catch (Exception e) {
+            log.error("Login failed for user {}: {}", userDTO.email(), e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
 
     @Operation(summary = "Logout", description = "User logout")
