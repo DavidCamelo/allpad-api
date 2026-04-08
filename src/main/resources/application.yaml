@@ -32,6 +32,13 @@ spring:
         order_updates: true
     show_sql: false
 management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    shutdown:
+      enabled: true
   tracing:
     sampling:
       probability: 1.0
