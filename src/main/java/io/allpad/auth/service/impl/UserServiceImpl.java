@@ -10,6 +10,7 @@ import io.allpad.auth.service.RoleService;
 import io.allpad.auth.service.UserService;
 import io.allpad.utils.EncryptionUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -89,8 +91,14 @@ public class UserServiceImpl implements UserService {
         return userMapper.map(user, null);
     }
 
-    @Cacheable(value = "users", key = "#username")
-    private Optional<User> findUserByUsername(String username) {
+    @Override
+    @Cacheable(
+            value = "users",
+            key = "#username",
+            unless = "#result == null || !#result.isPresent()"
+    )
+    public Optional<User> findUserByUsername(String username) {
+        log.info("find user by username {}", username);
         if (username.contains("@")) {
             return userRepository.findByEmail(username);
         }

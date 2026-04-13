@@ -1,15 +1,6 @@
-springdoc:
-  api-docs:
-    path: /v3/v1/api-docs
 spring:
   application:
     name: All Pad
-  cache:
-    type: redis
-  data:
-    redis:
-      host: redis
-      port: 6379
   threads:
     virtual:
       enabled: true
@@ -30,7 +21,7 @@ spring:
           batch_size: 2
         order_inserts: true
         order_updates: true
-    show_sql: false
+    show_sql: true
 management:
   endpoints:
     web:
@@ -40,22 +31,6 @@ management:
   endpoint:
     shutdown:
       enabled: true
-  tracing:
-    sampling:
-      probability: 1.0
-  otlp:
-    metrics:
-      export:
-        url: http://opentelemetry:4318/v1/metrics
-  opentelemetry:
-    tracing:
-      export:
-        otlp:
-          endpoint: http://opentelemetry:4318/v1/traces
-    logging:
-      export:
-        otlp:
-          endpoint: http://opentelemetry:4318/v1/logs
 logging:
   level:
     io.allpad: INFO
@@ -82,3 +57,6 @@ piston:
   url: REPLACE_FOR_THE_REAL_URL
   user: REPLACE_FOR_THE_REAL_USER
   password: REPLACE_FOR_THE_REAL_PASSWORD
+springdoc:
+  api-docs:
+    path: /v3/v1/api-docs
