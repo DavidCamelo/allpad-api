@@ -4,7 +4,6 @@ import io.allpad.auth.dto.UserDTO;
 import io.allpad.auth.entity.User;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface UserService {
     UserDTO create(UserDTO userDTO);
@@ -22,6 +21,4 @@ public interface UserService {
     UserDTO removeRoleFromUser(String username, String roleName);
 
     UserDTO map(User user);
-
-    Optional<User> findUserByUsername(String username);
 }

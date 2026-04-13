@@ -15,7 +15,7 @@ import java.time.Instant;
 public class PistonControllerAdvice {
 
     @ExceptionHandler(value = { Exception.class })
-    public ResponseEntity<ErrorDTO> handleException(Exception ex) {
+    public ResponseEntity<ErrorDTO> handleAnyException(Exception ex) {
         return buildError(ex, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

@@ -16,7 +16,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @Slf4j
@@ -60,9 +59,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Cacheable(value = "users", key = "#username")
     public User getUserByUsername(String username) {
-        return findUserByUsername(username).orElseThrow(
-                () -> new UserNotFoundException(String.format("User with username %s not found", username)));
+        log.info("find user by username {}", username);
+        return username.contains("@")
+                ? userRepository.findByEmail(username).orElseThrow(
+                        () -> new UserNotFoundException(String.format("User with email %s not found", username)))
+                : userRepository.findByUsername(username).orElseThrow(
+                        () -> new UserNotFoundException(String.format("User with username %s not found", username)));
     }
 
     @Override
@@ -89,19 +93,5 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO map(User user) {
         return userMapper.map(user, null);
-    }
-
-    @Override
-    @Cacheable(
-            value = "users",
-            key = "#username",
-            unless = "#result == null || !#result.isPresent()"
-    )
-    public Optional<User> findUserByUsername(String username) {
-        log.info("find user by username {}", username);
-        if (username.contains("@")) {
-            return userRepository.findByEmail(username);
-        }
-        return userRepository.findByUsername(username);
     }
 }

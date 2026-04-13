@@ -20,6 +20,11 @@ public class PaymentControllerAdvice {
         return buildError(ex, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(value = { Exception.class })
+    public ResponseEntity<ErrorDTO> handleAnyException(Exception ex) {
+        return buildError(ex, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     private ResponseEntity<ErrorDTO> buildError(Exception ex, HttpStatus status) {
         var errorDTO = ErrorDTO.builder().message(ex.getMessage()).timestamp(Instant.now()).build();
         log.error("Error message: {}, timestamp: {}", errorDTO.message(), errorDTO.timestamp(), ex);

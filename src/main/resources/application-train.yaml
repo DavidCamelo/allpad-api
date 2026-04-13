@@ -7,3 +7,5 @@ spring:
   jpa:
     hibernate:
       database-platform: org.hibernate.dialect.H2Dialect
+  cache:
+    type: simple
