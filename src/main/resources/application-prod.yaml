@@ -1,6 +1,4 @@
 spring:
-  application:
-    name: All Pad
   cache:
     type: redis
   data:
