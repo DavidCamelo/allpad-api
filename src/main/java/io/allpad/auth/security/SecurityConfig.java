@@ -2,6 +2,7 @@ package io.allpad.auth.security;
 
 import io.allpad.auth.dto.ErrorDTO;
 import io.allpad.auth.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -31,8 +32,9 @@ import java.util.stream.Collectors;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
-    private final JsonMapper jsonMapper = new JsonMapper();
+    private final JsonMapper jsonMapper;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -45,9 +47,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v*/auth/**", "/api/v*/plans", "/api/v*/stripe/webhook", "/swagger-ui/**", "/v3/v*/api-docs", "/v3/v*/api-docs/**")
+                        .requestMatchers("/api/actuator/**", "/api/v*/auth/**", "/api/v*/plans", "/api/v*/stripe/webhook", "/swagger-ui/**", "/v3/v*/api-docs", "/v3/v*/api-docs/**")
                         .permitAll()
-                        .requestMatchers("/api/actuator/**").hasRole("ADMIN")
+                        //.requestMatchers("/api/actuator/**").hasRole("ADMIN")
                         .requestMatchers("/api/v*/roles/**").hasRole("ADMIN")
                         .requestMatchers("/api/v*/users/**").hasAnyRole("ADMIN", "MOD")
                         .anyRequest().authenticated())

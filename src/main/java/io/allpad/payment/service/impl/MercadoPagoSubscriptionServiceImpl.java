@@ -3,16 +3,19 @@ package io.allpad.payment.service.impl;
 import com.mercadopago.MercadoPagoConfig;
 import com.mercadopago.client.preapproval.PreapprovalClient;
 import com.mercadopago.client.preapproval.PreapprovalCreateRequest;
+import com.mercadopago.client.preapproval.PreapprovalUpdateRequest;
 import com.mercadopago.exceptions.MPApiException;
 import io.allpad.auth.entity.User;
 import io.allpad.payment.config.MercadoPagoProperties;
 import io.allpad.payment.dto.SubscriptionDTO;
+import io.allpad.payment.entity.Subscription;
+import io.allpad.payment.error.SubscriptionException;
 import io.allpad.payment.repository.SubscriptionRepository;
 import io.allpad.payment.service.SubscriptionService;
 import io.allpad.utils.ContextUtils;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import jakarta.annotation.PostConstruct;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -20,9 +23,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import io.allpad.payment.entity.Subscription;
-import io.allpad.payment.error.SubscriptionException;
-
 import org.springframework.web.client.RestTemplate;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -36,7 +36,7 @@ public class MercadoPagoSubscriptionServiceImpl implements SubscriptionService {
     private final MercadoPagoProperties mercadopagoProperties;
     private final SubscriptionRepository subscriptionRepository;
     private final ContextUtils contextUtils;
-    private final JsonMapper jsonMapper = new JsonMapper();
+    private final JsonMapper jsonMapper;
 
     @PostConstruct
     public void init() {
@@ -44,15 +44,12 @@ public class MercadoPagoSubscriptionServiceImpl implements SubscriptionService {
     }
 
     private String getMpPlanId(String planName) {
-        if (planName == null)
-            return null;
-        if (planName.equalsIgnoreCase("Basic"))
-            return mercadopagoProperties.preapprovalPlanBasicId();
-        if (planName.equalsIgnoreCase("Standard"))
-            return mercadopagoProperties.preapprovalPlanStandardId();
-        if (planName.equalsIgnoreCase("Premium"))
-            return mercadopagoProperties.preapprovalPlanPremiumId();
-        return null;
+        return switch (planName) {
+            case "Basic" -> mercadopagoProperties.preapprovalPlanBasicId();
+            case "Standard" -> mercadopagoProperties.preapprovalPlanStandardId();
+            case "Premium" -> mercadopagoProperties.preapprovalPlanPremiumId();
+            default -> null;
+        };
     }
 
     @Override
@@ -64,7 +61,8 @@ public class MercadoPagoSubscriptionServiceImpl implements SubscriptionService {
         }
         try {
             return callPreapprovalEndpoint(subscriptionDTO, mpPlanId);
-        } catch (SubscriptionException e) {
+        } catch (Exception e) {
+            log.error("Failed to create Mercado Pago subscription using endpoint, trying SDK", e);
             return callPreapprovalSDK(subscriptionDTO, mpPlanId);
         }
     }
@@ -109,15 +107,15 @@ public class MercadoPagoSubscriptionServiceImpl implements SubscriptionService {
                 new ParameterizedTypeReference<>() {
                 });
         if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
-            throw new SubscriptionException("Mercado Pago API error: " + response.getStatusCode());
+            throw new SubscriptionException("Failed to create Mercado Pago subscription: " + response.getStatusCode());
         }
         return saveSubscription(user, subscriptionDTO, response.getBody().get("id").toString(),
                 response.getBody().get("init_point").toString());
     }
 
-    private SubscriptionDTO saveSubscription(User user, SubscriptionDTO subscriptionDTO, String preapprovalId,
-            String initPoint) {
-        Subscription sub = subscriptionRepository.findByUser(user).orElse(new Subscription());
+    private SubscriptionDTO saveSubscription(User user, SubscriptionDTO subscriptionDTO,
+            String preapprovalId, String initPoint) {
+        var sub = subscriptionRepository.findByUser(user).orElse(new Subscription());
         sub.setUser(user);
         sub.setSubscriptionId(preapprovalId);
         sub.setPlanId(subscriptionDTO.planId());
@@ -142,11 +140,10 @@ public class MercadoPagoSubscriptionServiceImpl implements SubscriptionService {
         log.info("Canceling Mercado Pago subscription for user: {}", user.getEmail());
         subscriptionRepository.findByUser(user).ifPresent(subscription -> {
             try {
-                PreapprovalClient client = new PreapprovalClient();
+                var client = new PreapprovalClient();
                 // To cancel a preapproval, send an update with status canceled
                 client.update(subscription.getSubscriptionId(),
-                        com.mercadopago.client.preapproval.PreapprovalUpdateRequest.builder().status("cancelled")
-                                .build());
+                        PreapprovalUpdateRequest.builder().status("cancelled").build());
                 subscription.setStatus("cancelled");
                 subscriptionRepository.save(subscription);
             } catch (Exception e) {
@@ -158,20 +155,16 @@ public class MercadoPagoSubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     public void handleWebhook(String payload, String sigHeader) {
-        log.info("Handling Mercado Pago webhook request: {}", payload);
+        log.info("Handling Mercado Pago webhook request: {} {}", payload, sigHeader);
         try {
-            com.fasterxml.jackson.databind.JsonNode jsonNode = new com.fasterxml.jackson.databind.ObjectMapper()
-                    .readTree(payload);
-            String type = jsonNode.has("type") ? jsonNode.get("type").asText() : "";
-
+            var jsonNode = jsonMapper.readTree(payload);
+            var type = jsonNode.has("type") ? jsonNode.get("type").asString() : "";
             if ("subscription_preapproval".equals(type) || "preapproval".equals(type)) {
-                String id = jsonNode.has("data") ? jsonNode.get("data").get("id").asText() : null;
+                var id = jsonNode.has("data") ? jsonNode.get("data").get("id").asString() : null;
                 if (id != null) {
                     log.info("Received Mercado Pago preapproval webhook for ID {}", id);
-
-                    com.mercadopago.client.preapproval.PreapprovalClient client = new com.mercadopago.client.preapproval.PreapprovalClient();
-                    com.mercadopago.resources.preapproval.Preapproval preapproval = client.get(id);
-
+                    var client = new PreapprovalClient();
+                    var preapproval = client.get(id);
                     subscriptionRepository.findBySubscriptionId(id).ifPresent(sub -> {
                         sub.setStatus(preapproval.getStatus());
                         subscriptionRepository.save(sub);

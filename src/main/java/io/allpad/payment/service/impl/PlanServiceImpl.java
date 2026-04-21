@@ -42,28 +42,28 @@ public class PlanServiceImpl implements PlanService {
         try {
             var existingSubscription = subscriptionRepository.findByUser(contextUtils.getUser());
             if (existingSubscription.isPresent()) {
-                var stripeSubscription = existingSubscription.get();
-                if (stripeSubscription.getSubscriptionId() != null && stripeSubscription.getSubscriptionId().startsWith("sub_")) {
-                    var subscription = Subscription.retrieve(stripeSubscription.getSubscriptionId());
-                    var currentPeriodEnd = subscription.getItems().getData().getFirst().getCurrentPeriodEnd();
+                var subscription = existingSubscription.get();
+                if (subscription.getSubscriptionId() != null && subscription.getSubscriptionId().startsWith("sub_")) {
+                    var stripeSubscription = Subscription.retrieve(subscription.getSubscriptionId());
+                    var currentPeriodEnd = stripeSubscription.getItems().getData().getFirst().getCurrentPeriodEnd();
                     if (Instant.now().isBefore(Instant.ofEpochSecond(currentPeriodEnd))) {
-                        var product = Product.retrieve(stripeSubscription.getPlanId());
+                        var product = Product.retrieve(subscription.getPlanId());
                         var subscriptionStatusDTO = SubscriptionStatusDTO.builder()
-                                .status(subscription.getStatus())
+                                .status(stripeSubscription.getStatus())
                                 .currentPeriodEnd(currentPeriodEnd)
                                 .build();
-                        return getPlan(product, stripeSubscription.getSubscriptionId(), subscriptionStatusDTO);
+                        return getPlan(product, subscription.getSubscriptionId(), subscriptionStatusDTO);
                     }
                 } else {
                     // It's a Mercado Pago Subscription
-                    var product = Product.retrieve(stripeSubscription.getPlanId());
-                    Long currentPeriodEnd = stripeSubscription.getCurrentPeriodEnd();
+                    var product = Product.retrieve(subscription.getPlanId());
+                    var currentPeriodEnd = subscription.getCurrentPeriodEnd();
                     if (currentPeriodEnd == null) currentPeriodEnd = Instant.now().plusSeconds(30 * 24 * 60 * 60).getEpochSecond(); // Default 30 days if not set
                     var subscriptionStatusDTO = SubscriptionStatusDTO.builder()
-                            .status(stripeSubscription.getStatus())
+                            .status(subscription.getStatus())
                             .currentPeriodEnd(currentPeriodEnd)
                             .build();
-                    return getPlan(product, stripeSubscription.getSubscriptionId(), subscriptionStatusDTO);
+                    return getPlan(product, subscription.getSubscriptionId(), subscriptionStatusDTO);
                 }
             }
         } catch (StripeException e) {
