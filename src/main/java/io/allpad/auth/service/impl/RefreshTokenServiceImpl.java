@@ -49,7 +49,9 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         var now = Instant.now();
         var expiredRefreshTokens = refreshTokenRepository.findAllByExpirationBefore(now.toEpochMilli());
         expiredRefreshTokens.forEach(refreshToken -> {
-            userService.evictUserFromCache(refreshToken.getUsername());
+            var userDTO = userService.getByUsername(refreshToken.getUsername());
+            userService.evictUserFromCache(userDTO.email());
+            userService.evictUserFromCache(userDTO.username());
             refreshTokenRepository.delete(refreshToken);
         });
     }
