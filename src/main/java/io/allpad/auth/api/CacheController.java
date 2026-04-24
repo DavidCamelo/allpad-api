@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,7 +21,7 @@ public class CacheController {
     private final CacheService cacheService;
 
     @Operation(summary = "Get all", description = "Get all users")
-    @GetMapping("{cacheName}/evict")
+    @PostMapping("{cacheName}/evict")
     public ResponseEntity<Void> evictCacheObjects(@PathVariable String cacheName) {
         cacheService.evictCacheObjects(cacheName);
         return ResponseEntity.ok().build();
