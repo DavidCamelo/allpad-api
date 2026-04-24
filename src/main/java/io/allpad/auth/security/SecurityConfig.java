@@ -47,10 +47,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/actuator/**", "/api/v*/auth/**", "/api/v*/plans", "/api/v*/stripe/webhook", "/swagger-ui/**", "/v3/v*/api-docs", "/v3/v*/api-docs/**")
+                        .requestMatchers("/api/v*/auth/**", "/api/v*/plans", "/api/v*/stripe/webhook", "/swagger-ui/**", "/v3/v*/api-docs", "/v3/v*/api-docs/**")
                         .permitAll()
-                        //.requestMatchers("/api/actuator/**").hasRole("ADMIN")
-                        .requestMatchers("/api/v*/roles/**").hasRole("ADMIN")
+                        .requestMatchers("/api/actuator/**", "/api/v*/cache/**", "/api/v*/roles/**").hasRole("ADMIN")
                         .requestMatchers("/api/v*/users/**").hasAnyRole("ADMIN", "MOD")
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -68,10 +67,9 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService(UserService userService) {
         return username -> {
-            var user = userService.getUserByUsername(username);
             var userDTO = userService.getByUsername(username);
             var authorities = userDTO.roles().stream().map(SimpleGrantedAuthority::new).collect(Collectors.toSet());
-            return new CustomUserDetails(userDTO.username(), userDTO.password(), authorities, user, userDTO);
+            return new CustomUserDetails(userDTO.username(), userDTO.password(), authorities, userDTO);
         };
     }
 

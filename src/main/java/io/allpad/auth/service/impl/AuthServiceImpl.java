@@ -62,19 +62,19 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthDTO refreshToken(TokenDTO tokenDTO) {
-        var userDTO = refreshTokenService.verifyExpiration(tokenDTO.token());
+        var expiration = refreshTokenService.verifyExpiration(tokenDTO.token());
+        var userDTO = userService.getByUsername(jwtService.validateTokenAndGetUsername(tokenDTO.token()));
         return AuthDTO.builder()
                 .user(userDTO)
                 .accessTokenExpiration(Instant.now().plusMillis(jwtProperties.accessTokenExpiration()).toEpochMilli())
-                .refreshTokenExpiration(userDTO.refreshTokenExpiration())
+                .refreshTokenExpiration(expiration)
                 .accessToken(jwtService.generateAccessToken(userDTO.username(), userDTO.roles()))
                 .build();
     }
 
     @Override
     public void recoverPassword(UserDTO userDTO) {
-        var user = userService.getUserByUsername(userDTO.email());
-        var token = jwtService.generateResetPasswordToken(user.getEmail());
+        var token = jwtService.generateResetPasswordToken(userDTO.email());
         log.info("https://allpad.io/?modal=update-password/{}", token);
         // TODO send email with token
     }

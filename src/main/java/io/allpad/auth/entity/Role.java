@@ -11,8 +11,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serial;
-import java.io.Serializable;
 import java.util.UUID;
 
 @Data
@@ -21,9 +19,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Entity
 @Table(name = "roles")
-public class Role implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
+public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;

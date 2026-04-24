@@ -12,7 +12,7 @@ import java.util.List;
 public class UserMapperImpl implements UserMapper {
 
     @Override
-    public UserDTO map(User user, String password) {
+    public UserDTO map(User user) {
         if (user == null) {
             return null;
         }
@@ -21,10 +21,9 @@ public class UserMapperImpl implements UserMapper {
                 .lastName(user.getLastName())
                 .username(user.getUsername())
                 .email(user.getEmail())
-                .password(password)
+                .password(user.getPassword())
                 .encryptionKey(user.getEncryptionKey())
                 .roles(user.getRoles().stream().map(Role::getName).toList())
-                .refreshTokenExpiration(user.getRefreshTokenExpiration())
                 .build();
     }
 
@@ -41,6 +40,6 @@ public class UserMapperImpl implements UserMapper {
 
     @Override
     public List<UserDTO> map(List<User> userList) {
-        return userList.stream().map(user -> map(user, null)).toList();
+        return userList.stream().map(this::map).toList();
     }
 }

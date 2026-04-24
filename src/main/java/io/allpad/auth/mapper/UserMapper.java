@@ -6,7 +6,7 @@ import io.allpad.auth.entity.User;
 import java.util.List;
 
 public interface UserMapper {
-    UserDTO map(User user, String password);
+    UserDTO map(User user);
 
     void map(UserDTO userDTO, User user);
 

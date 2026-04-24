@@ -11,6 +11,7 @@ import io.allpad.auth.service.UserService;
 import io.allpad.utils.EncryptionUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -42,10 +43,11 @@ public class UserServiceImpl implements UserService {
                 .password(passwordEncoder.encode(userDTO.password()))
                 .roles(Set.of(userRole))
                 .build();
-        return userMapper.map(userRepository.save(user), userDTO.password());
+        return userMapper.map(userRepository.save(user));
     }
 
     @Override
+    @CacheEvict(value = "dto::users", key = "#username")
     public void updatePassword(String username, String password) {
         var user = getUserByUsername(username);
         user.setPassword(passwordEncoder.encode(password));
@@ -53,20 +55,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Cacheable(value = "dto::users", key = "#username")
     public UserDTO getByUsername(String username) {
+        log.info("get user by username {}", username);
         var user = getUserByUsername(username);
-        return userMapper.map(user, user.getPassword());
-    }
-
-    @Override
-    @Cacheable(value = "users", key = "#username")
-    public User getUserByUsername(String username) {
-        log.info("find user by username {}", username);
-        return username.contains("@")
-                ? userRepository.findByEmail(username).orElseThrow(
-                        () -> new UserNotFoundException(String.format("User with email %s not found", username)))
-                : userRepository.findByUsername(username).orElseThrow(
-                        () -> new UserNotFoundException(String.format("User with username %s not found", username)));
+        return userMapper.map(user);
     }
 
     @Override
@@ -75,23 +68,34 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @CacheEvict(value = "dto::users", key = "#username")
     public UserDTO assignRoleToUser(String username, String roleName) {
         var user = getUserByUsername(username);
         var role = roleService.findByName(roleName);
         user.getRoles().add(role);
-        return userMapper.map(userRepository.save(user), null);
+        return userMapper.map(userRepository.save(user));
     }
 
     @Override
+    @CacheEvict(value = "dto::users", key = "#username")
     public UserDTO removeRoleFromUser(String username, String roleName) {
         var user = getUserByUsername(username);
         var role = roleService.findByName(roleName);
         user.getRoles().remove(role);
-        return userMapper.map(userRepository.save(user), null);
+        return userMapper.map(userRepository.save(user));
     }
 
     @Override
-    public UserDTO map(User user) {
-        return userMapper.map(user, null);
+    @CacheEvict(value = "dto::users", key = "#username")
+    public void evictUserFromCache(String username) {
+        log.info("evicting user from cache {}", username);
+    }
+
+    private User getUserByUsername(String username) {
+        return username.contains("@")
+                ? userRepository.findByEmail(username).orElseThrow(
+                        () -> new UserNotFoundException(String.format("User with email %s not found", username)))
+                : userRepository.findByUsername(username).orElseThrow(
+                        () -> new UserNotFoundException(String.format("User with username %s not found", username)));
     }
 }
