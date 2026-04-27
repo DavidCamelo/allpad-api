@@ -4,7 +4,7 @@ import io.allpad.auth.entity.Role;
 import io.allpad.auth.entity.User;
 import io.allpad.auth.repository.RoleRepository;
 import io.allpad.auth.repository.UserRepository;
-import io.allpad.utils.EncryptionUtils;
+import io.allpad.pad.utils.EncryptionUtils;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;

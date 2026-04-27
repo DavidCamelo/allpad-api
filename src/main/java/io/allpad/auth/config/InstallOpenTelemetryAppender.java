@@ -1,4 +1,4 @@
-package io.allpad.utils;
+package io.allpad.auth.config;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
@@ -13,7 +13,7 @@ public class InstallOpenTelemetryAppender implements InitializingBean {
     private final OpenTelemetry openTelemetry;
 
     @Override
-    public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet() {
         OpenTelemetryAppender.install(openTelemetry);
     }
 }

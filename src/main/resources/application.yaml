@@ -39,9 +39,9 @@ logging:
     console: "%yellow(%d{yyyy-MM-dd HH:mm:ss.SSSZZZZZ}) %highlight(%-5level) ${PID:-} --- %red([${spring.application.name}]) %magenta([%thread]) %cyan([%X{traceId:-}-%X{spanId:-}]) %logger : %msg %n"
 jwt:
   secret: REPLACE_FOR_THE_REAL_JWT_SECRET
-  reset-password-expiration: 900000 # -> 15 minutes
-  access-token-expiration: 600000 # -> 10 minutes
-  refresh-token-expiration: 86400000 # -> 1 days
+  reset-password-expiration: 900_000 # -> 15 minutes
+  access-token-expiration: 600_000 # -> 10 minutes
+  refresh-token-expiration: 604_800_000 # -> 7 days
 stripe:
   secret-key: REPLACE_FOR_THE_REAL_STRIPE_API_KEY
   public-key: REPLACE_FOR_THE_REAL_STRIPE_PUBLIC_KEY
