@@ -16,7 +16,7 @@ import io.allpad.utils.ContextUtils;
 import io.allpad.utils.EncryptionUtils;
 import io.allpad.utils.LZStringUtils;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -24,7 +24,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class HistoryServiceImpl implements HistoryService {
@@ -50,6 +49,7 @@ public class HistoryServiceImpl implements HistoryService {
     }
 
     @Override
+    @Cacheable(value = "dto::history", key = "#id")
     public HistoryDTO getById(UUID id) {
         return historyMapper.map(findById(id));
     }

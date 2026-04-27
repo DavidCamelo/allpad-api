@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @CacheEvict(value = "dto::users", key = "#username")
+    @CacheEvict(value = "dto::user", key = "#username")
     public void updatePassword(String username, String password) {
         var user = getUserByUsername(username);
         user.setPassword(passwordEncoder.encode(password));
@@ -55,9 +55,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Cacheable(value = "dto::users", key = "#username")
+    @Cacheable(value = "dto::user", key = "#username")
     public UserDTO getByUsername(String username) {
-        log.info("get user by username {}", username);
         var user = getUserByUsername(username);
         return userMapper.map(user);
     }
@@ -68,7 +67,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @CacheEvict(value = "dto::users", key = "#username")
+    @CacheEvict(value = "dto::user", key = "#username")
     public UserDTO assignRoleToUser(String username, String roleName) {
         var user = getUserByUsername(username);
         var role = roleService.findByName(roleName);
@@ -77,7 +76,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @CacheEvict(value = "dto::users", key = "#username")
+    @CacheEvict(value = "dto::user", key = "#username")
     public UserDTO removeRoleFromUser(String username, String roleName) {
         var user = getUserByUsername(username);
         var role = roleService.findByName(roleName);
@@ -86,7 +85,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @CacheEvict(value = "dto::users", key = "#username")
+    @CacheEvict(value = "dto::user", key = "#username")
     public void evictUserFromCache(String username) {
         log.info("evicting user from cache {}", username);
     }

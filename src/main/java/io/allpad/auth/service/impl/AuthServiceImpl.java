@@ -35,6 +35,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthDTO login(UserDTO userDTO) {
+        userService.evictUserFromCache(userDTO.username());
         var authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(userDTO.username(), userDTO.password()));
         if (authentication.isAuthenticated()) {

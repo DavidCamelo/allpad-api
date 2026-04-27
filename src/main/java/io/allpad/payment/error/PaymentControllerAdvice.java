@@ -20,7 +20,7 @@ public class PaymentControllerAdvice {
         return buildError(ex, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(value = { Exception.class })
+    @ExceptionHandler(value = { Exception.class, RuntimeException.class })
     public ResponseEntity<ErrorDTO> handleAnyException(Exception ex) {
         return buildError(ex, HttpStatus.INTERNAL_SERVER_ERROR);
     }

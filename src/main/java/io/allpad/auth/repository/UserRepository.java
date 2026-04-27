@@ -1,6 +1,6 @@
 package io.allpad.auth.repository;
 
-import io.allpad.auth.dto.UserTinyDTO;
+import io.allpad.auth.dto.TinyUserDTO;
 import io.allpad.auth.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -15,5 +15,5 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     Optional<User> findByUsername(String username);
 
-    List<UserTinyDTO> findAllByEmailIsNotNullAndUsernameIsNotNull();
+    List<TinyUserDTO> findAllByEmailIsNotNullAndUsernameIsNotNull();
 }

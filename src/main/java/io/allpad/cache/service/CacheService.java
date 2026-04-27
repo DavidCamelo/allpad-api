@@ -1,4 +1,4 @@
-package io.allpad.auth.service;
+package io.allpad.cache.service;
 
 import java.util.List;
 

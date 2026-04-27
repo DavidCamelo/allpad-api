@@ -44,6 +44,16 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         }
     }
 
+    @Override
+    public void deleteRefreshToken(String token) {
+        var refreshTokenO = refreshTokenRepository.findByToken(token);
+        if (refreshTokenO.isPresent()) {
+            var refreshToken = refreshTokenO.get();
+            userService.evictUserFromCache(refreshToken.getUsername());
+            refreshTokenRepository.delete(refreshToken);
+        }
+    }
+
     @Scheduled(fixedDelay =  10_000)
     public void deleteExpiredRefreshTokens() {
         var now = Instant.now();
@@ -54,15 +64,5 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
             userService.evictUserFromCache(userDTO.username());
             refreshTokenRepository.delete(refreshToken);
         });
-    }
-
-    @Override
-    public void deleteRefreshToken(String token) {
-        var refreshTokenO = refreshTokenRepository.findByToken(token);
-        if (refreshTokenO.isPresent()) {
-            var refreshToken = refreshTokenO.get();
-            userService.evictUserFromCache(refreshToken.getUsername());
-            refreshTokenRepository.delete(refreshToken);
-        }
     }
 }

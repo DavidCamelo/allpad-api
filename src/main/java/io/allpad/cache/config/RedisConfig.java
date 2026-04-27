@@ -1,4 +1,4 @@
-package io.allpad.auth.config;
+package io.allpad.cache.config;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.RequiredArgsConstructor;
@@ -22,34 +22,32 @@ public class RedisConfig {
 
     @Bean
     public RedisCacheConfiguration cacheConfiguration() {
-        return RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(Duration.ofMinutes(60))
-                .disableCachingNullValues()
-                .computePrefixWith(cacheName -> "allpad::" + cacheName + "::");
+        return createRedisCacheConfiguration(Duration.ofMinutes(60));
     }
 
     @Bean
     public RedisCacheManagerBuilderCustomizer redisCacheManagerBuilderCustomizer() {
-        JsonMapper mapperWithType = jsonMapper.rebuild()
+        return (builder) -> builder
+                .withCacheConfiguration("dto::user", createRedisCacheConfiguration(Duration.ofDays(7)))
+                .withCacheConfiguration("dto::history", createRedisCacheConfiguration(Duration.ofDays(365)));
+    }
+
+    private RedisCacheConfiguration createRedisCacheConfiguration(Duration ttl) {
+        var customMapper = jsonMapper.rebuild()
                 .activateDefaultTyping(
                         BasicPolymorphicTypeValidator.builder().allowIfBaseType(Object.class).build(),
                         DefaultTyping.NON_FINAL_AND_RECORDS,
                         JsonTypeInfo.As.PROPERTY
                 )
                 .build();
-
-        return (builder) -> builder
-                .withCacheConfiguration("dto::users",
-                        RedisCacheConfiguration.defaultCacheConfig()
-                                .entryTtl(Duration.ofDays(1))
-                                .disableCachingNullValues()
-                                .computePrefixWith(cacheName -> "allpad::" + cacheName + "::")
-                                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(
-                                        new GenericJacksonJsonRedisSerializer(mapperWithType))
-                                ).serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(
-                                        new StringRedisSerializer())
-                                ))
-                .withCacheConfiguration("reports",
-                        RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(30)));
+        return RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(ttl)
+                .disableCachingNullValues()
+                .computePrefixWith(cacheName -> "allpad::" + cacheName + "::")
+                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(
+                        new GenericJacksonJsonRedisSerializer(customMapper))
+                ).serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(
+                        new StringRedisSerializer())
+                );
     }
 }

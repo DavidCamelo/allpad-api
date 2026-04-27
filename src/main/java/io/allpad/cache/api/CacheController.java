@@ -1,6 +1,6 @@
-package io.allpad.auth.api;
+package io.allpad.cache.api;
 
-import io.allpad.auth.service.CacheService;
+import io.allpad.cache.service.CacheService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

@@ -8,8 +8,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,7 +22,6 @@ import tools.jackson.databind.json.JsonMapper;
 import java.io.IOException;
 import java.time.Instant;
 
-@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JWTFilter extends OncePerRequestFilter {
@@ -61,7 +58,6 @@ public class JWTFilter extends OncePerRequestFilter {
             try {
                 username = jwtService.validateTokenAndGetUsername(jwtToken);
             } catch (JWTVerificationException e) {
-                log.error("Invalid JWT token: {}", e.getMessage());
                 var errorDTO = ErrorDTO.builder().message(String.format("Invalid JWT token: %s", e.getMessage()))
                         .timestamp(Instant.now()).build();
                 response.setStatus(HttpStatus.UNAUTHORIZED.value());

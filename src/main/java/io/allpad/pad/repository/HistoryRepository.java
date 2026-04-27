@@ -11,5 +11,7 @@ import java.util.UUID;
 
 @Repository
 public interface HistoryRepository extends JpaRepository<History, UUID> {
+    List<TinyHistoryDTO> findAllByIdIsNotNull();
+
     List<TinyHistoryDTO> findAllByFile(File file);
 }

@@ -2,9 +2,9 @@ package io.allpad.utils;
 
 import io.allpad.auth.dto.UserDTO;
 import io.allpad.auth.entity.User;
+import io.allpad.auth.error.UserNotFoundException;
 import io.allpad.auth.repository.UserRepository;
 import io.allpad.auth.security.CustomUserDetails;
-import io.allpad.auth.error.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
