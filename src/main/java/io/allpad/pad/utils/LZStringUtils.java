@@ -7,7 +7,7 @@ import java.util.List;
 
 public class LZStringUtils {
 
-    static String keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+    static final String keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
 
     public static String compress(String uncompressed) {
 

@@ -99,6 +99,7 @@ public class MercadoPagoSubscriptionServiceImpl implements SubscriptionService {
         body.put("reason", "Subscription to " + subscriptionDTO.planName());
         body.put("payer_email", user.getEmail());
         body.put("back_url", "https://allpad.io");
+        // body.put("card_token_id", );
         var request = new HttpEntity<>(body, headers);
         ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
                 "https://api.mercadopago.com/preapproval",
@@ -121,6 +122,7 @@ public class MercadoPagoSubscriptionServiceImpl implements SubscriptionService {
         sub.setPlanId(subscriptionDTO.planId());
         sub.setPriceId(subscriptionDTO.priceId());
         sub.setStatus("pending");
+        sub.setProvider(subscriptionDTO.provider());
         subscriptionRepository.save(sub);
 
         return SubscriptionDTO.builder()
@@ -129,7 +131,7 @@ public class MercadoPagoSubscriptionServiceImpl implements SubscriptionService {
                 .planName(subscriptionDTO.planName())
                 .subscriptionId(preapprovalId)
                 .clientSecret(initPoint)
-                .provider("mercadopago")
+                .provider(subscriptionDTO.provider())
                 .status("pending")
                 .build();
     }
@@ -175,5 +177,10 @@ public class MercadoPagoSubscriptionServiceImpl implements SubscriptionService {
         } catch (Exception e) {
             log.error("Failed to process Mercado Pago webhook", e);
         }
+    }
+
+    @Override
+    public boolean canHandle(String provider) {
+        return "mercadopago".equalsIgnoreCase(provider);
     }
 }

@@ -72,6 +72,7 @@ public class StripeSubscriptionServiceImpl implements SubscriptionService {
             subscription.setPriceId(subscriptionDTO.priceId());
             subscription.setStatus(stripeSubscription.getStatus());
             subscription.setCurrentPeriodEnd(stripeSubscription.getItems().getData().getLast().getCurrentPeriodEnd());
+            subscription.setProvider(subscriptionDTO.provider());
             subscriptionRepository.save(subscription);
             var paymentIntentId = stripeSubscription.getLatestInvoiceObject().getPayments().getData().getLast()
                     .getPayment()
@@ -220,5 +221,11 @@ public class StripeSubscriptionServiceImpl implements SubscriptionService {
                 .build();
         var customer = Customer.create(createParams);
         return customer.getId();
+    }
+
+    @Override
+    public boolean canHandle(String provider) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'canHandle'");
     }
 }

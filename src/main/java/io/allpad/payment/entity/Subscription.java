@@ -25,8 +25,9 @@ public class Subscription {
     private String customerId; // Customer ID in Stripe (cus_...)
     private String subscriptionId; // Subscription ID in Stripe (sub_...)
     private String planId; // The product ID
-    private String priceId; //price ID
+    private String priceId; // price ID
     private String status; // active, incomplete, canceled, etc.
     private String invoiceStatus; // paid, unpaid, etc.
     private Long currentPeriodEnd; // Timestamp for when the current period ends
+    private String provider; // stripe or mercado pago
 }

@@ -8,4 +8,6 @@ public interface SubscriptionService {
     void cancelSubscription();
 
     void handleWebhook(String payload, String sigHeader);
+
+    boolean canHandle(String provider);
 }
