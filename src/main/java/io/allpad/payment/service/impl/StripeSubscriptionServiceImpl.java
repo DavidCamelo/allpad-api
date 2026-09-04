@@ -155,10 +155,10 @@ public class StripeSubscriptionServiceImpl implements SubscriptionService {
                     handlePaymentSucceeded((Invoice) stripeObject);
                     break;
                 case "customer.subscription.updated":
-                    handleSubscriptionUpdated((com.stripe.model.Subscription) stripeObject);
+                    handleSubscription("updated", (com.stripe.model.Subscription) stripeObject);
                     break;
                 case "customer.subscription.deleted":
-                    handleSubscriptionDeleted((com.stripe.model.Subscription) stripeObject);
+                    handleSubscription("deleted", (com.stripe.model.Subscription) stripeObject);
                     break;
                 default:
                     log.info("Unhandled event type: {}", event.getType());
@@ -179,20 +179,8 @@ public class StripeSubscriptionServiceImpl implements SubscriptionService {
         }
     }
 
-    private void handleSubscriptionUpdated(com.stripe.model.Subscription stripeSubscription) {
-        log.info("Handling subscription updated for subscription: {}, {}, {}",
-                stripeSubscription.getId(), stripeSubscription.getCustomer(), stripeSubscription.getStatus());
-        var subscriptionOpt = subscriptionRepository.findBySubscriptionId(stripeSubscription.getId());
-        if (subscriptionOpt.isPresent()) {
-            var subscription = subscriptionOpt.get();
-            subscription.setStatus(stripeSubscription.getStatus());
-            subscription.setCurrentPeriodEnd(stripeSubscription.getItems().getData().getLast().getCurrentPeriodEnd());
-            subscriptionRepository.save(subscription);
-        }
-    }
-
-    private void handleSubscriptionDeleted(com.stripe.model.Subscription stripeSubscription) {
-        log.info("Handling subscription deleted for subscription: {}, {}, {}",
+    private void handleSubscription(String action, com.stripe.model.Subscription stripeSubscription) {
+        log.info("Handling subscription {} for subscription: {}, {}, {}", action,
                 stripeSubscription.getId(), stripeSubscription.getCustomer(), stripeSubscription.getStatus());
         var subscriptionOpt = subscriptionRepository.findBySubscriptionId(stripeSubscription.getId());
         if (subscriptionOpt.isPresent()) {
@@ -225,7 +213,6 @@ public class StripeSubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     public boolean canHandle(String provider) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'canHandle'");
+        return "stripe".equalsIgnoreCase(provider);
     }
 }
